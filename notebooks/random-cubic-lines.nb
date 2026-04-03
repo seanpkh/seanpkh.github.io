@@ -1,0 +1,502 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     21853,        494]
+NotebookOptionsPosition[     21454,        476]
+NotebookOutlinePosition[     21800,        491]
+CellTagsIndexPosition[     21757,        488]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"monomialList", "[", 
+   RowBox[{"vars_List", ",", 
+    RowBox[{"m_Integer", "?", "NonNegative"}]}], "]"}], ":=", 
+  RowBox[{"Flatten", "[", 
+   RowBox[{"Map", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Apply", "[", 
+       RowBox[{"Times", ",", 
+        RowBox[{"vars", "^", "#"}]}], "]"}], "&"}], ",", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"FrobeniusSolve", "[", 
+        RowBox[{
+         RowBox[{"ConstantArray", "[", 
+          RowBox[{"1", ",", 
+           RowBox[{"Length", "[", "vars", "]"}]}], "]"}], ",", "k"}], "]"}], 
+       ",", 
+       RowBox[{"{", 
+        RowBox[{"k", ",", "0", ",", "m"}], "}"}]}], "]"}], ",", 
+     RowBox[{"{", "2", "}"}]}], "]"}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"randPoly2", "[", "deg_", "]"}], ":=", " ", "\[IndentingNewLine]", 
+  RowBox[{"(", " ", 
+   RowBox[{
+    RowBox[{"l", "=", 
+     RowBox[{"monomialList", "[", " ", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", "y"}], "}"}], ",", " ", "deg"}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Total", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"RandomInteger", "[", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"-", "10"}], ",", "10"}], "}"}], "]"}], "*", "#"}], " ", 
+       "&"}], "/@", " ", "l"}], "]"}]}], "\[IndentingNewLine]", 
+   ")"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"randPoly3", "[", "deg_", "]"}], ":=", " ", "\[IndentingNewLine]", 
+  RowBox[{"(", " ", 
+   RowBox[{
+    RowBox[{"l", "=", 
+     RowBox[{"monomialList", "[", " ", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"X", ",", "Y", ",", "Z"}], "}"}], ",", " ", "deg"}], "]"}]}], 
+    ";", "\[IndentingNewLine]", 
+    RowBox[{"Total", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"RandomInteger", "[", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"-", "10"}], ",", "10"}], "}"}], "]"}], "*", "#"}], " ", 
+       "&"}], "/@", " ", "l"}], "]"}]}], "\[IndentingNewLine]", 
+   ")"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"randPoly", "[", 
+    RowBox[{"deg_", ",", " ", "gens_"}], "]"}], ":=", "\[IndentingNewLine]", 
+   RowBox[{"(", "\[IndentingNewLine]", " ", 
+    RowBox[{
+     RowBox[{"l", "=", 
+      RowBox[{"monomialList", "[", " ", 
+       RowBox[{"gens", ",", " ", "deg"}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Total", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"RandomInteger", "[", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "10"}], ",", "10"}], "}"}], "]"}], "*", "#"}], " ", 
+        "&"}], "/@", " ", "l"}], "]"}]}], "\[IndentingNewLine]", ")"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Panel", "[", "\[IndentingNewLine]", 
+   RowBox[{"DynamicModule", "[", " ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"F", "=", "1"}], ",", " ", 
+       RowBox[{"showLines", "=", "False"}], ",", " ", "lines1", ",", " ", 
+       "lines2", ",", " ", "lines3"}], "}"}], ",", " ", "\[IndentingNewLine]", 
+     RowBox[{"Column", "[", 
+      RowBox[{
+       RowBox[{"{", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Row", "[", " ", 
+          RowBox[{"{", 
+           RowBox[{"\"\<Show lines? \>\"", ",", " ", 
+            RowBox[{"Checkbox", "[", 
+             RowBox[{"Dynamic", "[", "showLines", "]"}], "]"}], ",", 
+            "\"\<  \>\"", ",", 
+            RowBox[{"Dynamic", "[", 
+             RowBox[{"Button", "[", 
+              RowBox[{"\"\<New surface\>\"", ",", " ", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"F", "=", 
+                 RowBox[{"randPoly", "[", 
+                  RowBox[{"3", ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"X", ",", "Y", ",", "Z"}], "}"}]}], " ", "]"}]}], 
+                ";", "\[IndentingNewLine]", 
+                RowBox[{"eqns1", "=", 
+                 RowBox[{"Table", "[", " ", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"F", " ", "\[Equal]", " ", "0"}], ")"}], "/.", 
+                    " ", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"X", " ", "\[Rule]", " ", 
+                    RowBox[{"a", "+", 
+                    RowBox[{"c", " ", "s"}]}]}], ",", " ", 
+                    RowBox[{"Y", " ", "\[Rule]", " ", 
+                    RowBox[{"b", "+", 
+                    RowBox[{"c", " ", "t"}]}]}], ",", " ", 
+                    RowBox[{"Z", "\[Rule]", "c"}]}], "}"}]}], ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"c", ",", " ", 
+                    RowBox[{"-", "1"}], ",", " ", "2"}], "}"}]}], "]"}]}], 
+                ";", " ", 
+                RowBox[{"(*", " ", 
+                 RowBox[{
+                  RowBox[{"Delta", " ", "Z"}], " ", "\[NotEqual]", " ", "0"}],
+                  " ", "*)"}], "\[IndentingNewLine]", 
+                RowBox[{"eqns2", "=", 
+                 RowBox[{"Table", "[", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"F", "\[Equal]", "0"}], ")"}], " ", "/.", " ", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"X", " ", "\[Rule]", " ", 
+                    RowBox[{"a", " ", "+", " ", 
+                    RowBox[{"c", " ", "s"}]}]}], ",", " ", 
+                    RowBox[{"Y", "\[Rule]", " ", "c"}], ",", " ", 
+                    RowBox[{"Z", "->", " ", "d"}]}], "}"}]}], " ", ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"c", ",", " ", 
+                    RowBox[{"-", "1"}], ",", " ", "2"}], "}"}]}], "]"}]}], 
+                ";", " ", 
+                RowBox[{"(*", " ", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"Delta", " ", "Z"}], " ", "=", " ", "0"}], ",", 
+                  " ", 
+                  RowBox[{
+                   RowBox[{"Delta", " ", "Y"}], "\[NotEqual]", "0"}]}], " ", 
+                 "*)"}], "\[IndentingNewLine]", 
+                RowBox[{"eqns3", "=", 
+                 RowBox[{"Table", "[", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"F", "\[Equal]", "0"}], ")"}], " ", "/.", " ", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"X", " ", "\[Rule]", "  ", "c"}], ",", 
+                    RowBox[{"Y", "->", "b"}], " ", ",", " ", 
+                    RowBox[{"Z", "->", "d"}]}], "}"}]}], " ", ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"c", ",", " ", 
+                    RowBox[{"-", "1"}], ",", " ", "2"}], "}"}]}], "]"}]}], 
+                ";", 
+                RowBox[{"(*", " ", 
+                 RowBox[{
+                  RowBox[{"Delta", " ", "Z"}], " ", "=", "  ", 
+                  RowBox[{
+                   RowBox[{"Delta", " ", "Y"}], "\[NotEqual]", "0"}]}], " ", 
+                 "*)"}], "\[IndentingNewLine]", 
+                RowBox[{"sols1", "=", 
+                 RowBox[{"NSolve", "[", 
+                  RowBox[{"eqns1", ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"a", ",", "b", ",", "s", ",", "t"}], "}"}], ",", 
+                   " ", "Reals"}], "]"}]}], ";", "\[IndentingNewLine]", 
+                RowBox[{"sols2", "=", 
+                 RowBox[{"NSolve", "[", 
+                  RowBox[{"eqns2", ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"a", ",", "s", ",", " ", "d"}], "}"}], ",", " ", 
+                   "Reals"}], "]"}]}], ";", "\[IndentingNewLine]", 
+                RowBox[{"sols3", "=", 
+                 RowBox[{"NSolve", "[", 
+                  RowBox[{"eqns3", ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"b", ",", "d"}], "}"}], ",", " ", "Reals"}], 
+                  "]"}]}], ";", "\[IndentingNewLine]", 
+                RowBox[{"If", "  ", "[", 
+                 RowBox[{
+                  RowBox[{"sols1", "\[NotEqual]", " ", 
+                   RowBox[{"{", "}"}]}], ",", " ", 
+                  RowBox[{"lines1", "=", 
+                   RowBox[{
+                    RowBox[{"InfiniteLine", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"a", ",", "b", ",", "0"}], "}"}], ",", " ", 
+                    RowBox[{"{", 
+                    RowBox[{"s", ",", " ", "t", ",", " ", "1"}], "}"}]}], 
+                    "]"}], " ", "/.", " ", "sols1"}]}], " ", ",", " ", 
+                  RowBox[{"lines1", "=", 
+                   RowBox[{"{", "}"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+                RowBox[{"If", " ", "[", 
+                 RowBox[{
+                  RowBox[{"sols2", "\[NotEqual]", 
+                   RowBox[{"{", "}"}]}], ",", " ", 
+                  RowBox[{"lines2", "=", 
+                   RowBox[{
+                    RowBox[{"InfiniteLine", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"a", ",", " ", "0", ",", " ", "d"}], "}"}], ",", 
+                    " ", 
+                    RowBox[{"{", 
+                    RowBox[{"s", ",", " ", "1", ",", " ", "0"}], "}"}]}], 
+                    "]"}], " ", "/.", " ", "sols2"}]}], ",", " ", 
+                  RowBox[{"lines2", "=", 
+                   RowBox[{"{", "}"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+                RowBox[{"If", " ", "[", 
+                 RowBox[{
+                  RowBox[{"sols3", "\[NotEqual]", 
+                   RowBox[{"{", "}"}]}], ",", " ", 
+                  RowBox[{"lines3", "=", 
+                   RowBox[{
+                    RowBox[{"InfiniteLine", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", " ", "b", ",", " ", "d"}], "}"}], ",", 
+                    " ", 
+                    RowBox[{"{", 
+                    RowBox[{"1", ",", " ", "0", ",", " ", "0"}], "}"}]}], 
+                    "]"}], " ", "/.", " ", "sols3"}]}], " ", ",", " ", 
+                  RowBox[{"lines3", "=", 
+                   RowBox[{"{", "}"}]}]}], "]"}], ";"}]}], 
+              "\[IndentingNewLine]", "]"}], "]"}]}], "}"}], "]"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+         "Dynamic", "[", "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
+          RowBox[{
+           RowBox[{"If", " ", "[", 
+            RowBox[{
+             RowBox[{"showLines", "\[Equal]", "True"}], ",", " ", 
+             RowBox[{"G", "=", "\[IndentingNewLine]", "\t", 
+              RowBox[{"Join", "[", 
+               RowBox[{"{", " ", 
+                RowBox[{
+                 RowBox[{"ContourPlot3D", "[", " ", 
+                  RowBox[{
+                   RowBox[{"F", "\[Equal]", "0"}], ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"X", ",", 
+                    RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"Y", ",", 
+                    RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", " ", 
+                   RowBox[{"{", 
+                    RowBox[{"Z", ",", 
+                    RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", " ", 
+                   RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+                   RowBox[{"Mesh", "\[Rule]", "None"}], ",", " ", 
+                   RowBox[{"Axes", "\[Rule]", "None"}], ",", " ", 
+                   RowBox[{"Boxed", "\[Rule]", "False"}], ",", "  ", 
+                   RowBox[{"ContourStyle", "\[Rule]", 
+                    RowBox[{"{", "LightBlue", "}"}]}]}], "]"}], ",", 
+                 "\[IndentingNewLine]", "\t", 
+                 RowBox[{"Graphics3D", "[", 
+                  RowBox[{"Catenate", "[", 
+                   RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"Thickness", "[", ".01", "]"}], "}"}], ",", 
+                    "lines1", " ", ",", " ", "lines2", " ", ",", " ", 
+                    "lines3"}], " ", "}"}], "]"}], " ", "]"}]}], 
+                "\[IndentingNewLine]", "   ", "}"}], "]"}]}]}], " ", "]"}], 
+           ";", "\[IndentingNewLine]", "\t", 
+           RowBox[{"If", " ", "[", 
+            RowBox[{
+             RowBox[{"showLines", "\[Equal]", "False"}], ",", " ", 
+             RowBox[{"G", "=", 
+              RowBox[{"ContourPlot3D", "[", " ", 
+               RowBox[{
+                RowBox[{"F", "\[Equal]", "0"}], ",", " ", 
+                RowBox[{"{", 
+                 RowBox[{"X", ",", 
+                  RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", " ", 
+                RowBox[{"{", 
+                 RowBox[{"Y", ",", 
+                  RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", " ", 
+                RowBox[{"{", 
+                 RowBox[{"Z", ",", 
+                  RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", " ", 
+                RowBox[{"ImageSize", "\[Rule]", "600"}], ",", " ", 
+                RowBox[{"Axes", "\[Rule]", "None"}], ",", " ", 
+                RowBox[{"Boxed", "\[Rule]", "False"}], ",", " ", 
+                RowBox[{"Mesh", "\[Rule]", "None"}], ",", " ", 
+                RowBox[{"ContourStyle", "\[Rule]", 
+                 RowBox[{"{", "LightBlue", "}"}]}]}], "]"}]}]}], "]"}], ";", 
+           "\[IndentingNewLine]", "\t", 
+           RowBox[{"Show", "[", "G", "]"}]}], "\[IndentingNewLine]", "\t", 
+          "\[IndentingNewLine]", "   ", "]"}], ",", "\[IndentingNewLine]", 
+         RowBox[{"Dynamic", "[", "F", "]"}]}], "\[IndentingNewLine]", "}"}], 
+       ",", "  ", "Center", ",", " ", 
+       RowBox[{"ItemSize", "\[Rule]", 
+        RowBox[{"{", 
+         RowBox[{"100", ",", "Automatic"}], "}"}]}]}], "]"}]}], 
+    "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", "]"}], 
+  "\[IndentingNewLine]", 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.694266314615508*^9, 3.6942665656745954`*^9}, {
+   3.6942667087041683`*^9, 3.694266714876343*^9}, {3.694266922623614*^9, 
+   3.6942670142164955`*^9}, {3.6942670602346745`*^9, 
+   3.6942671962568984`*^9}, {3.6942672283004646`*^9, 3.694267268357399*^9}, {
+   3.6942673041379347`*^9, 3.6942673233597116`*^9}, {3.694267367045794*^9, 
+   3.6942673749663253`*^9}, 3.694267423978368*^9, {3.6942674543133864`*^9, 
+   3.6942674611759233`*^9}, {3.694267541148538*^9, 3.694267566427722*^9}, {
+   3.6942676262853546`*^9, 3.6942676286174917`*^9}, {3.694267755900587*^9, 
+   3.6942678058269033`*^9}, {3.6942679550204954`*^9, 3.694267981861274*^9}, {
+   3.694268111299764*^9, 3.6942681289181805`*^9}, {3.694268257828808*^9, 
+   3.694268274731992*^9}, {3.694268309044055*^9, 3.6942683989038057`*^9}, {
+   3.727965907401635*^9, 3.7279659117216845`*^9}, {3.7279659832014318`*^9, 
+   3.7279660353241525`*^9}, {3.727966169677139*^9, 3.727966220538971*^9}}],
+
+Cell[BoxData[
+ PanelBox[
+  DynamicModuleBox[{$CellContext`F$$ = -6 - 5 $CellContext`X - 
+   9 $CellContext`X^2 + 4 $CellContext`X^3 - 
+   8 $CellContext`Y + (10 $CellContext`X) $CellContext`Y - (
+    3 $CellContext`X^2) $CellContext`Y + 
+   3 $CellContext`Y^2 - (
+    8 $CellContext`X) $CellContext`Y^2 - $CellContext`Y^3 + 
+   4 $CellContext`Z - (2 $CellContext`X) $CellContext`Z - (
+    5 $CellContext`X^2) $CellContext`Z - (
+    10 $CellContext`Y) $CellContext`Z - ($CellContext`X $CellContext`Y) \
+$CellContext`Z + 8 $CellContext`Z^2 + (6 $CellContext`X) $CellContext`Z^2 - 
+   2 $CellContext`Z^3, $CellContext`showLines$$ = 
+   True, $CellContext`lines1$$ = {
+    InfiniteLine[{-15.667084097145256`, 17.252645242045727`, 
+      0}, {-19.249476439619244`, 19.674311519839794`, 1}], 
+    InfiniteLine[{6.033817118385182, 2.7355918500264096`, 0}, {
+     5.984951897089253, 2.793466810084745, 1}], 
+    InfiniteLine[{-2.679159172688739, -1.4352470515612281`, 0}, {
+     0.5468920672443284, 0.19030679567038017`, 1}], 
+    InfiniteLine[{-0.9047216872227326, 7.3772026893679845`, 
+      0}, {-1.0062516140712041`, 7.470308275776432, 1}], 
+    InfiniteLine[{3.3348238223000526`, 0.8705747250009334, 0}, {
+     0.04100647621140073, -1.3138275712000997`, 1}], 
+    InfiniteLine[{-0.46857988839987125`, -0.37705869365191386`, 0}, {
+     0.9836878170150175, 0.3993977703649381, 1}], 
+    InfiniteLine[{0.32609328660963743`, -1.208472296634485, 0}, {
+     0.7658044796932274, -0.8129887248659369, 
+      1}]}, $CellContext`lines2$$ = {}, $CellContext`lines3$$ = {}}, 
+   TagBox[GridBox[{
+      {
+       TemplateBox[{"\"Show lines? \"",CheckboxBox[
+          Dynamic[$CellContext`showLines$$]],"\"  \"",DynamicBox[
+          ToBoxes[
+           Button[
+           "New surface", $CellContext`F$$ = $CellContext`randPoly[
+              3, {$CellContext`X, $CellContext`Y, $CellContext`Z}]; \
+$CellContext`eqns1 = Table[
+               
+               ReplaceAll[$CellContext`F$$ == 
+                0, {$CellContext`X -> $CellContext`a + $CellContext`c \
+$CellContext`s, $CellContext`Y -> $CellContext`b + $CellContext`c \
+$CellContext`t, $CellContext`Z -> $CellContext`c}], {$CellContext`c, -1, 
+                2}]; $CellContext`eqns2 = Table[
+               
+               ReplaceAll[$CellContext`F$$ == 
+                0, {$CellContext`X -> $CellContext`a + $CellContext`c \
+$CellContext`s, $CellContext`Y -> $CellContext`c, $CellContext`Z -> \
+$CellContext`d}], {$CellContext`c, -1, 2}]; $CellContext`eqns3 = Table[
+               
+               ReplaceAll[$CellContext`F$$ == 
+                0, {$CellContext`X -> $CellContext`c, $CellContext`Y -> \
+$CellContext`b, $CellContext`Z -> $CellContext`d}], {$CellContext`c, -1, 
+                2}]; $CellContext`sols1 = 
+             NSolve[$CellContext`eqns1, {$CellContext`a, $CellContext`b, \
+$CellContext`s, $CellContext`t}, Reals]; $CellContext`sols2 = 
+             NSolve[$CellContext`eqns2, {$CellContext`a, $CellContext`s, \
+$CellContext`d}, Reals]; $CellContext`sols3 = 
+             NSolve[$CellContext`eqns3, {$CellContext`b, $CellContext`d}, 
+               Reals]; If[$CellContext`sols1 != {}, $CellContext`lines1$$ = 
+              ReplaceAll[
+                
+                InfiniteLine[{$CellContext`a, $CellContext`b, 
+                  0}, {$CellContext`s, $CellContext`t, 
+                  1}], $CellContext`sols1], $CellContext`lines1$$ = {}]; 
+            If[$CellContext`sols2 != {}, $CellContext`lines2$$ = ReplaceAll[
+                
+                InfiniteLine[{$CellContext`a, 
+                  0, $CellContext`d}, {$CellContext`s, 1, 
+                  0}], $CellContext`sols2], $CellContext`lines2$$ = {}]; 
+            If[$CellContext`sols3 != {}, $CellContext`lines3$$ = ReplaceAll[
+                
+                InfiniteLine[{0, $CellContext`b, $CellContext`d}, {1, 0, 
+                 0}], $CellContext`sols3], $CellContext`lines3$$ = {}]; Null],
+            StandardForm]]},
+        "RowDefault"]},
+      {
+       DynamicBox[ToBoxes[
+        If[$CellContext`showLines$$ == True, $CellContext`G = Join[{
+              
+              ContourPlot3D[$CellContext`F$$ == 
+               0, {$CellContext`X, -5, 5}, {$CellContext`Y, -5, 
+                5}, {$CellContext`Z, -5, 5}, ImageSize -> Large, Mesh -> None,
+                Axes -> None, Boxed -> False, ContourStyle -> {LightBlue}], 
+              Graphics3D[
+               Catenate[{{
+                  Thickness[
+                  0.01]}, $CellContext`lines1$$, $CellContext`lines2$$, \
+$CellContext`lines3$$}]]}]]; 
+         If[$CellContext`showLines$$ == False, $CellContext`G = 
+           ContourPlot3D[$CellContext`F$$ == 
+             0, {$CellContext`X, -5, 5}, {$CellContext`Y, -5, 
+              5}, {$CellContext`Z, -5, 5}, ImageSize -> 600, Axes -> None, 
+             Boxed -> False, Mesh -> None, ContourStyle -> {LightBlue}]]; 
+         Show[$CellContext`G], StandardForm],
+        ImageSizeCache->{576., {310., 315.}}]},
+      {
+       DynamicBox[ToBoxes[$CellContext`F$$, StandardForm],
+        ImageSizeCache->{575., {1., 12.}}]}
+     },
+     DefaultBaseStyle->"Column",
+     GridBoxAlignment->{"Columns" -> {{Center}}},
+     GridBoxItemSize->{"Columns" -> {{100}}, "Rows" -> {{Automatic}}}],
+    "Column"],
+   DynamicModuleValues:>{}]]], "Output",
+ CellChangeTimes->{
+  3.6942678064492717`*^9, {3.694267932487368*^9, 3.6942679830167093`*^9}, {
+   3.6942681123012886`*^9, 3.694268129265541*^9}, {3.6942682629632287`*^9, 
+   3.6942682770112705`*^9}, {3.694268312233082*^9, 3.6942683520300846`*^9}, 
+   3.6942684009753838`*^9, 3.694269377493642*^9, 3.694371427441659*^9, {
+   3.7279657866461525`*^9, 3.727965791339678*^9}, {3.7279660023082438`*^9, 
+   3.7279660360422974`*^9}, {3.727966184943758*^9, 3.7279662223570843`*^9}}]
+}, Open  ]],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{3.7279667733237705`*^9}],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{3.727966777414121*^9}]
+},
+WindowSize->{1484, 905},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 14923, 332, 905, "Input"],
+Cell[15506, 356, 5788, 111, 716, "Output"]
+}, Open  ]],
+Cell[21309, 470, 70, 1, 30, "Input"],
+Cell[21382, 473, 68, 1, 63, "Input"]
+}
+]
+*)
+

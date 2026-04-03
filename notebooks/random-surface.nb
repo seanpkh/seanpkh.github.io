@@ -1,0 +1,211 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      7616,        203]
+NotebookOptionsPosition[      7294,        187]
+NotebookOutlinePosition[      7642,        202]
+CellTagsIndexPosition[      7599,        199]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"monomialList", "[", 
+   RowBox[{"vars_List", ",", 
+    RowBox[{"m_Integer", "?", "NonNegative"}]}], "]"}], ":=", 
+  RowBox[{"Flatten", "[", 
+   RowBox[{"Map", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Apply", "[", 
+       RowBox[{"Times", ",", 
+        RowBox[{"vars", "^", "#"}]}], "]"}], "&"}], ",", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"FrobeniusSolve", "[", 
+        RowBox[{
+         RowBox[{"ConstantArray", "[", 
+          RowBox[{"1", ",", 
+           RowBox[{"Length", "[", "vars", "]"}]}], "]"}], ",", "k"}], "]"}], 
+       ",", 
+       RowBox[{"{", 
+        RowBox[{"k", ",", "0", ",", "m"}], "}"}]}], "]"}], ",", 
+     RowBox[{"{", "2", "}"}]}], "]"}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"randPoly2", "[", "deg_", "]"}], ":=", " ", "\[IndentingNewLine]", 
+  RowBox[{"(", " ", 
+   RowBox[{
+    RowBox[{"l", "=", 
+     RowBox[{"monomialList", "[", " ", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", "y"}], "}"}], ",", " ", "deg"}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Total", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"RandomInteger", "[", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"-", "10"}], ",", "10"}], "}"}], "]"}], "*", "#"}], " ", 
+       "&"}], "/@", " ", "l"}], "]"}]}], "\[IndentingNewLine]", 
+   ")"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"randPoly3", "[", "deg_", "]"}], ":=", " ", "\[IndentingNewLine]", 
+   RowBox[{"(", " ", 
+    RowBox[{
+     RowBox[{"l", "=", 
+      RowBox[{"monomialList", "[", " ", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"x", ",", "y", ",", "z"}], "}"}], ",", " ", "deg"}], "]"}]}],
+      ";", "\[IndentingNewLine]", 
+     RowBox[{"Total", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"RandomInteger", "[", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "10"}], ",", "10"}], "}"}], "]"}], "*", "#"}], " ", 
+        "&"}], "/@", " ", "l"}], "]"}]}], "\[IndentingNewLine]", ")"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Panel", "[", "\[IndentingNewLine]", 
+  RowBox[{"DynamicModule", "[", " ", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"deg", "=", "1"}], ",", " ", 
+      RowBox[{"f", "=", "1"}]}], "}"}], ",", " ", "\[IndentingNewLine]", 
+    RowBox[{"Column", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Row", "[", 
+         RowBox[{"{", 
+          RowBox[{"\"\<Degree \>\"", ",", " ", 
+           RowBox[{"Dynamic", "[", "deg", "]"}], ",", " ", 
+           RowBox[{"Slider", "[", 
+            RowBox[{
+             RowBox[{"Dynamic", "[", "deg", "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"1", ",", "10", ",", "1"}], "}"}]}], "]"}], ",", " ", 
+           RowBox[{"Dynamic", "[", 
+            RowBox[{"Button", "[", 
+             RowBox[{"\"\<New surface\>\"", ",", " ", "\[IndentingNewLine]", 
+              RowBox[{
+               RowBox[{"f", "=", 
+                RowBox[{"randPoly3", "[", "deg", "]"}]}], ";"}]}], "]"}], 
+            "]"}]}], "}"}], "]"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"Dynamic", "[", 
+         RowBox[{"ContourPlot3D", "[", 
+          RowBox[{
+           RowBox[{"f", "\[Equal]", "0"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"x", ",", " ", 
+             RowBox[{"-", "10"}], ",", " ", "10"}], "}"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"y", ",", " ", 
+             RowBox[{"-", "10"}], ",", " ", "10"}], "}"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"z", ",", 
+             RowBox[{"-", "10"}], ",", "10"}], "}"}], ",", " ", 
+           RowBox[{"Mesh", "\[Rule]", "False"}], ",", " ", 
+           RowBox[{"PlotPoints", "\[Rule]", " ", "60"}], ",", " ", 
+           RowBox[{"ImageSize", "\[Rule]", "Large"}]}], "]"}], "]"}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Dynamic", "[", "f", "]"}]}], "\[IndentingNewLine]", "}"}], 
+      ",", "  ", "Center", ",", " ", 
+      RowBox[{"ItemSize", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"100", ",", "Automatic"}], "}"}]}]}], "]"}]}], 
+   "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", "]"}]}], "Input",
+ CellChangeTimes->{{3.6942219066158233`*^9, 3.6942219504228287`*^9}, {
+  3.6942221152472425`*^9, 3.6942221159137506`*^9}, {3.694222185246708*^9, 
+  3.6942221861641273`*^9}, {3.6942222581806326`*^9, 3.694222280946437*^9}, {
+  3.694222392646775*^9, 3.694222422543613*^9}, {3.694222482447491*^9, 
+  3.6942225232225113`*^9}, {3.694222582833962*^9, 3.6942225830184507`*^9}, {
+  3.6942657468534985`*^9, 3.6942658288062334`*^9}, {3.6942659438158913`*^9, 
+  3.6942659886240306`*^9}, {3.6942660578326197`*^9, 3.6942661111986217`*^9}, {
+  3.6942689558964186`*^9, 3.694268959915945*^9}, {3.6942689905824156`*^9, 
+  3.694269003105197*^9}, {3.694269074647294*^9, 3.694269085814665*^9}, {
+  3.6942691332771435`*^9, 3.694269133646224*^9}, {3.6942692822058992`*^9, 
+  3.694269307619046*^9}}],
+
+Cell[BoxData[
+ PanelBox[
+  DynamicModuleBox[{$CellContext`deg$$ = 1, $CellContext`f$$ = 3 - 
+   10 $CellContext`x - 5 $CellContext`y - 9 $CellContext`z}, 
+   TagBox[GridBox[{
+      {
+       TemplateBox[{"\"Degree \"",DynamicBox[
+          ToBoxes[$CellContext`deg$$, StandardForm]],SliderBox[
+          Dynamic[$CellContext`deg$$], {1, 10, 1}],DynamicBox[
+          ToBoxes[
+           Button[
+           "New surface", $CellContext`f$$ = \
+$CellContext`randPoly3[$CellContext`deg$$]; Null], StandardForm]]},
+        "RowDefault"]},
+      {
+       DynamicBox[ToBoxes[
+         ContourPlot3D[$CellContext`f$$ == 
+          0, {$CellContext`x, -10, 10}, {$CellContext`y, -10, 
+           10}, {$CellContext`z, -10, 10}, Mesh -> False, PlotPoints -> 60, 
+          ImageSize -> Large], StandardForm],
+        ImageSizeCache->{576., {324., 328.}}]},
+      {
+       DynamicBox[ToBoxes[$CellContext`f$$, StandardForm],
+        ImageSizeCache->{82., {3., 9.}}]}
+     },
+     DefaultBaseStyle->"Column",
+     GridBoxAlignment->{"Columns" -> {{Center}}},
+     GridBoxItemSize->{"Columns" -> {{100}}, "Rows" -> {{Automatic}}}],
+    "Column"],
+   DynamicModuleValues:>{}]]], "Output",
+ CellChangeTimes->{
+  3.6942222824337606`*^9, 3.694222359531408*^9, {3.6942224231443963`*^9, 
+   3.6942224266133757`*^9}, 3.694222525609787*^9, {3.6942659711197243`*^9, 
+   3.69426599249936*^9}, {3.6942660680821247`*^9, 3.694266113566086*^9}, 
+   3.6942678406679583`*^9, 3.6942678972146297`*^9, 3.6942688745066805`*^9, 
+   3.694268960400676*^9, 3.6942690034525957`*^9, 3.6942690862153654`*^9, 
+   3.694269138310153*^9, 3.6942693089872074`*^9, 3.6943711740658956`*^9}]
+}, Open  ]]
+},
+WindowSize->{1500, 917},
+WindowMargins->{{-8, Automatic}, {Automatic, -8}},
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 5054, 124, 392, "Input"],
+Cell[5637, 148, 1641, 36, 774, "Output"]
+}, Open  ]]
+}
+]
+*)
+

@@ -1,0 +1,911 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     45020,        903]
+NotebookOptionsPosition[     44721,        890]
+NotebookOutlinePosition[     45064,        905]
+CellTagsIndexPosition[     45021,        902]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"PRESS", " ", "SHIFT"}], "-", 
+     RowBox[{"ENTER", " ", "TO", " ", "RUN", " ", "THIS", " ", "CELL"}]}], 
+    ",", " ", 
+    RowBox[{
+    "THEN", " ", "USE", " ", "ROOTLOOPS", " ", "IN", " ", "THE", " ", 
+     "OUTPUT"}]}], " ", "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"DynamicModule", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"pointList", "=", 
+        RowBox[{"{", "}"}]}], ",", "  ", "\[IndentingNewLine]", 
+       RowBox[{"curPoly", "=", 
+        RowBox[{
+         RowBox[{"z", "^", "2"}], " ", "-", " ", "t"}]}], ",", " ", 
+       "\[IndentingNewLine]", 
+       RowBox[{"inputPolynomial", "=", " ", 
+        RowBox[{
+         RowBox[{"z", "^", "2"}], " ", "-", " ", "t"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"degree", "=", "2"}], ",", " ", "\[IndentingNewLine]", 
+       RowBox[{"plottedRamPoints", "=", " ", 
+        RowBox[{"Text", "[", 
+         RowBox[{
+          RowBox[{"Style", "[", 
+           RowBox[{"\"\<X\>\"", ",", 
+            RowBox[{"FontSize", "\[Rule]", "14"}], ",", 
+            RowBox[{"FontWeight", "->", "Bold"}], ",", 
+            RowBox[{"FontColor", "->", "Red"}]}], "]"}], ",", " ", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}]}], "]"}]}], " ", ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"rootLists", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"{", "}"}], ",", " ", "2"}], "]"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"rootColors", "=", " ", 
+        RowBox[{"Take", "[", 
+         RowBox[{
+          RowBox[{"ColorData", "[", 
+           RowBox[{"97", ",", " ", "\"\<ColorList\>\""}], "]"}], ",", " ", 
+          "2"}], "]"}]}], ",", "\[IndentingNewLine]", 
+       RowBox[{"parameterRange", "=", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "5"}], ",", "5"}], "}"}]}], "}"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"rootRange", "=", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "5"}], ",", "5"}], "}"}]}], "}"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"parameterZoomFactor", "=", "1"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"rootZoomFactor", "=", "1"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"rootDimension", "=", "2"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"showText", "=", "False"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"showAxes", "=", "False"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"labelRoots", "=", "False"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"rootCollision", "=", "False"}]}], "\[IndentingNewLine]", 
+      "}"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+     RowBox[{"Column", "[", 
+      RowBox[{
+       RowBox[{"{", "\[IndentingNewLine]", 
+        RowBox[{"(*", " ", "Controls", " ", "*)"}], "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Style", "[", 
+          RowBox[{
+          "\"\<Instructions: Click and drag to draw a loop in the parameter \
+space on the left; the paths followed by the roots of f_t(z) are drawn on the \
+right. Avoid the red x's which denote t such that f_t(x) has a repeated root. \
+To change the polynomial, change it in the text box then press the update \
+button.\\n\>\"", ",", " ", 
+           RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", "  ", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Row", "[", 
+          RowBox[{
+           RowBox[{"{", " ", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"Style", "[", 
+              RowBox[{
+              "\"\<Polynomial family (variable z, parameter t): f_t(z)=\>\"", 
+               ",", " ", 
+               RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"Style", "[", " ", 
+              RowBox[{
+               RowBox[{"InputField", "[", 
+                RowBox[{"Dynamic", "[", "inputPolynomial", "]"}], "]"}], ",", 
+               " ", 
+               RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}]}], 
+            "\[IndentingNewLine]", "}"}], ",", " ", "\"\< \>\""}], "]"}], ",",
+          "\[IndentingNewLine]", 
+         RowBox[{"Row", "[", 
+          RowBox[{"{", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"Button", "[", 
+             RowBox[{
+              RowBox[{"Style", "[", 
+               RowBox[{"\"\<Update polynomial family\>\"", ",", " ", 
+                RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", " ", 
+              "\[IndentingNewLine]", 
+              RowBox[{
+               RowBox[{"curPoly", "=", "inputPolynomial"}], ";", 
+               "\[IndentingNewLine]", 
+               RowBox[{"degree", "=", 
+                RowBox[{"Exponent", "[", 
+                 RowBox[{"curPoly", ",", " ", "z"}], "]"}]}], ";", 
+               "\[IndentingNewLine]", 
+               RowBox[{"pointList", "=", 
+                RowBox[{"{", "}"}]}], ";", "\[IndentingNewLine]", 
+               RowBox[{"rootLists", "=", 
+                RowBox[{"Table", "[", 
+                 RowBox[{
+                  RowBox[{"{", "}"}], ",", " ", "degree"}], "]"}]}], ";", 
+               "\[IndentingNewLine]", 
+               RowBox[{"rootColors", "=", " ", 
+                RowBox[{"Take", "[", 
+                 RowBox[{
+                  RowBox[{"ColorData", "[", 
+                   RowBox[{"97", ",", " ", "\"\<ColorList\>\""}], "]"}], ",", 
+                  " ", "degree"}], "]"}]}], ";", "\[IndentingNewLine]", 
+               "\[IndentingNewLine]", 
+               RowBox[{"cRamPoints", "=", 
+                RowBox[{"Solve", "[", " ", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"Discriminant", "[", 
+                    RowBox[{"curPoly", ",", "z"}], "]"}], " ", "\[Equal]", 
+                   " ", "0"}], ",", " ", "t"}], "]"}]}], ";", " ", 
+               RowBox[{"(*", 
+                RowBox[{
+                "Ramification", " ", "points", " ", "as", " ", "complex", " ",
+                  "numbers"}], " ", "*)"}], "\[IndentingNewLine]", 
+               RowBox[{"If", "[", 
+                RowBox[{
+                 RowBox[{
+                  RowBox[{"Length", "[", "cRamPoints", "]"}], 
+                  "\[GreaterEqual]", "1"}], ",", "\[IndentingNewLine]", 
+                 RowBox[{
+                  RowBox[{"ramPoints", "=", " ", 
+                   RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"Re", "[", "t", "]"}], ",", " ", 
+                    RowBox[{"Im", "[", "t", "]"}]}], "}"}], "/.", " ", 
+                    "cRamPoints"}]}], ";", " ", 
+                  RowBox[{"(*", 
+                   RowBox[{
+                   "Convert", " ", "these", " ", "complex", " ", "numbers", 
+                    " ", "to", " ", 
+                    RowBox[{"(", 
+                    RowBox[{"x", ",", "y"}], ")"}], " ", "coordinates"}], " ",
+                    "*)"}], "\[IndentingNewLine]", 
+                  RowBox[{"plottedRamPoints", "=", " ", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"Text", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"\"\<X\>\"", ",", 
+                    RowBox[{"FontSize", "\[Rule]", "14"}], ",", 
+                    RowBox[{"FontWeight", "->", "Bold"}], ",", 
+                    RowBox[{"FontColor", "->", "Red"}]}], "]"}], ",", " ", 
+                    "#"}], "]"}], " ", "&"}], "/@", " ", "ramPoints"}]}], 
+                  ";"}], "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+                 RowBox[{"plottedRamPoints", "=", 
+                  RowBox[{"{", "}"}]}]}], "]"}]}]}], "]"}], ",", 
+            "\[IndentingNewLine]", "\[IndentingNewLine]", 
+            RowBox[{"Style", "[", 
+             RowBox[{
+             "\"\< (remember to put a * between t's and z's, e.g. z*t^2 \
+instead of zt^2 when entering polynomial)\\n\>\"", ",", 
+              RowBox[{"FontSize", "\[Rule]", "16"}]}], "]"}]}], 
+           "\[IndentingNewLine]", "\[IndentingNewLine]", "}"}], "]"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Row", "[", 
+          RowBox[{"{", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"Row", "[", " ", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"Style", "[", 
+                RowBox[{"\"\<Show values: \>\"", ",", "  ", 
+                 RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", "  ", 
+               RowBox[{"Checkbox", "[", 
+                RowBox[{"Dynamic", "[", "showText", "]"}], "]"}]}], "}"}], 
+             "]"}], ",", "\[IndentingNewLine]", 
+            RowBox[{"Row", "[", " ", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"Style", "[", 
+                RowBox[{"\"\<      Number roots: \>\"", ",", " ", 
+                 RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", "  ", 
+               RowBox[{"Checkbox", "[", 
+                RowBox[{"Dynamic", "[", "labelRoots", "]"}], "]"}]}], "}"}], 
+             "]"}], ",", "\[IndentingNewLine]", 
+            RowBox[{"Row", "[", " ", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"Style", "[", 
+                RowBox[{"\"\<      Show axes: \>\"", ",", " ", 
+                 RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", "  ", 
+               RowBox[{"Checkbox", "[", 
+                RowBox[{"Dynamic", "[", "showAxes", "]"}], "]"}]}], "}"}], 
+             "]"}], ",", "\[IndentingNewLine]", 
+            RowBox[{"Style", "[", 
+             RowBox[{
+              RowBox[{"Row", "[", " ", 
+               RowBox[{"{", 
+                RowBox[{"\"\<      Root display type: \>\"", ",", "  ", 
+                 RowBox[{"SetterBar", "[", 
+                  RowBox[{
+                   RowBox[{"Dynamic", "[", "rootDimension", "]"}], ",", 
+                   RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"2", "\[Rule]", "\"\<Loops\>\""}], ",", 
+                    RowBox[{"3", "\[Rule]", "\"\<Braids\>\""}]}], "}"}]}], 
+                  "]"}]}], "}"}], "]"}], ",", " ", 
+              RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}]}], 
+           "\[IndentingNewLine]", "}"}], "]"}], ",", "\[IndentingNewLine]", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Dynamic", "[", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"rootCollision", "\[Equal]", "True"}], ",", " ", 
+            "\[IndentingNewLine]", 
+            RowBox[{"Style", "[", 
+             RowBox[{
+             "\"\<STATUS: ROOT COLLISION; RESTART LOOP\\n\>\"", ",", " ", 
+              RowBox[{"FontColor", "\[Rule]", "Red"}], ",", "  ", 
+              RowBox[{"FontWeight", "\[Rule]", "Bold"}], ",", " ", 
+              RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"Style", "[", 
+             RowBox[{
+             "\"\<STATUS: WORKING PROPERLY, DRAW SOME LOOPS IN THE \
+t-PARAMETER SPACE ON THE LEFT! \\n\>\"", ",", "  ", 
+              RowBox[{"FontWeight", "\[Rule]", "Bold"}], ",", " ", 
+              RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}]}], 
+           "\[IndentingNewLine]", "]"}], "]"}], ",", "\[IndentingNewLine]", 
+         "\[IndentingNewLine]", 
+         RowBox[{"(*", " ", "Graphics", " ", "*)"}], "\[IndentingNewLine]", 
+         RowBox[{"Grid", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"{", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"Column", "[", 
+               RowBox[{
+                RowBox[{"{", "\[IndentingNewLine]", 
+                 RowBox[{
+                  RowBox[{"EventHandler", "[", "\[IndentingNewLine]", 
+                   RowBox[{
+                    RowBox[{"Dynamic", "[", 
+                    RowBox[{"Graphics", " ", "[", " ", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"plottedRamPoints", ",", 
+                    RowBox[{"ColorArrowDraw", "[", 
+                    RowBox[{"pointList", ",", " ", "Black"}], "]"}]}], "}"}], 
+                    "\[IndentingNewLine]", ",", " ", 
+                    RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+                    RowBox[{"PlotRange", "\[Rule]", 
+                    RowBox[{"parameterZoomFactor", "*", "parameterRange"}]}], 
+                    ",", " ", 
+                    RowBox[{"Axes", "\[Rule]", "showAxes"}], ",", " ", 
+                    RowBox[{"GridLines", "\[Rule]", "Automatic"}]}], "]"}], 
+                    "]"}], ",", "\[IndentingNewLine]", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"\"\<MouseDown\>\"", "\[RuleDelayed]", 
+                    RowBox[{"(", "\[IndentingNewLine]", 
+                    RowBox[{
+                    RowBox[{"curPoint", "=", " ", 
+                    RowBox[{"MousePosition", "[", "\"\<Graphics\>\"", "]"}]}],
+                     ";", "\[IndentingNewLine]", 
+                    RowBox[{"pointList", "=", 
+                    RowBox[{"{", "curPoint", "}"}]}], ";", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"curRoots", "=", 
+                    RowBox[{"ComputeRoots", "[", 
+                    RowBox[{"curPoint", ",", " ", "curPoly"}], "]"}]}], ";", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"rootLists", "=", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"{", "#", "}"}], " ", "&"}], "/@", " ", 
+                    "curRoots"}]}], ";", "\[IndentingNewLine]", 
+                    RowBox[{"rootCollision", "=", "False"}], ";"}], 
+                    "\[IndentingNewLine]", ")"}]}], ",", " ", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{
+                    "\"\<MouseDragged\>\"", "\[RuleDelayed]", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"(", "\[IndentingNewLine]", "  ", 
+                    RowBox[{"If", " ", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Length", "[", "pointList", "]"}], ">", "0"}], 
+                    ",", "\[IndentingNewLine]", 
+                    RowBox[{
+                    RowBox[{"curPoint", "=", " ", 
+                    RowBox[{"MousePosition", "[", "\"\<Graphics\>\"", "]"}]}],
+                     ";", "\[IndentingNewLine]", 
+                    RowBox[{"AppendTo", "[", " ", 
+                    RowBox[{"pointList", ",", " ", "curPoint"}], "]"}], ";", 
+                    "\[IndentingNewLine]", "\[IndentingNewLine]", 
+                    RowBox[{"curRoots", "=", " ", 
+                    RowBox[{"ComputeRoots", "[", 
+                    RowBox[{"curPoint", ",", " ", "curPoly"}], "]"}]}], ";", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"collisionTest", "=", 
+                    RowBox[{"{", "}"}]}], ";", "\[IndentingNewLine]", 
+                    RowBox[{"If", " ", "[", " ", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Length", "[", "curRoots", "]"}], "==", " ", 
+                    "degree"}], ",", "\[IndentingNewLine]", "\t", 
+                    RowBox[{
+                    RowBox[{"For", "[", 
+                    RowBox[{
+                    RowBox[{"j", "=", "1"}], ",", " ", 
+                    RowBox[{"j", "\[LessEqual]", " ", "degree"}], ",", " ", 
+                    RowBox[{"j", "++"}], ",", "\[IndentingNewLine]", "\t", 
+                    RowBox[{
+                    RowBox[{"nearestRoot", "=", " ", 
+                    RowBox[{
+                    RowBox[{"Nearest", "[", 
+                    RowBox[{"curRoots", ",", " ", 
+                    RowBox[{"Last", "[", 
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "j", "]"}], "]"}], " ", "]"}]}], " ", "]"}], 
+                    "[", 
+                    RowBox[{"[", "1", "]"}], "]"}]}], ";", 
+                    "\[IndentingNewLine]", "\t", 
+                    RowBox[{"AppendTo", "[", " ", 
+                    RowBox[{
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "j", "]"}], "]"}], ",", " ", "nearestRoot"}],
+                     " ", "]"}], ";", "\[IndentingNewLine]", "\t", 
+                    RowBox[{"AppendTo", "[", 
+                    RowBox[{"collisionTest", ",", " ", "nearestRoot"}], "]"}],
+                     ";"}]}], "\[IndentingNewLine]", "]"}], 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"If", " ", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Signature", "[", "collisionTest", "]"}], 
+                    "\[Equal]", "0"}], ",", " ", 
+                    RowBox[{"rootCollision", "=", "True"}]}], "]"}]}]}], 
+                    "\[IndentingNewLine]", "\[IndentingNewLine]", 
+                    "\[IndentingNewLine]", "]"}]}]}], "\[IndentingNewLine]", 
+                    "]"}], "\[IndentingNewLine]", ")"}]}]}], 
+                    "\[IndentingNewLine]", "}"}]}], "\[IndentingNewLine]", 
+                   "]"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+                  RowBox[{"Row", "[", 
+                   RowBox[{"{", "\[IndentingNewLine]", 
+                    RowBox[{
+                    RowBox[{"Button", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"\"\<Zoom in\>\"", ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", " ", 
+                    RowBox[{"parameterZoomFactor", "=", " ", 
+                    RowBox[{".8", "*", " ", "parameterZoomFactor"}]}]}], 
+                    "]"}], ",", "\[IndentingNewLine]", 
+                    RowBox[{"Button", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"\"\<Zoom out\>\"", ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", " ", 
+                    RowBox[{"parameterZoomFactor", " ", "=", " ", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"1", "/", ".8"}], ")"}], "*", " ", 
+                    "parameterZoomFactor"}]}]}], "]"}]}], 
+                    "\[IndentingNewLine]", "}"}], "]"}], ",", 
+                  "\[IndentingNewLine]", "\[IndentingNewLine]", 
+                  RowBox[{"Dynamic", "[", 
+                   RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"pointList", "\[NotEqual]", 
+                    RowBox[{"{", "}"}]}], " ", "&&", " ", 
+                    RowBox[{"showText", "\[Equal]", "True"}]}], ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{
+                    RowBox[{"valOft", "=", 
+                    RowBox[{"SetPrecision", "[", " ", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Last", "[", "pointList", "]"}], "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], "+", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Last", "[", "pointList", "]"}], "[", 
+                    RowBox[{"[", "2", "]"}], "]"}], "*", "I"}]}], ",", " ", 
+                    "3"}], "]"}]}], ";", "\[IndentingNewLine]", 
+                    RowBox[{"Style", "[", " ", 
+                    RowBox[{
+                    RowBox[{"Column", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"Row", "[", 
+                    RowBox[{"{", 
+                    RowBox[{"\"\<t=\>\"", ",", "valOft"}], "}"}], "]"}], ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"Row", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"Subscript", "[", 
+                    RowBox[{"\"\<f\>\"", ",", "\"\<t\>\""}], "]"}], ",", 
+                    "\"\<(z)=\>\"", ",", 
+                    RowBox[{"(", 
+                    RowBox[{"curPoly", " ", "/.", " ", 
+                    RowBox[{"t", "\[Rule]", "valOft"}]}], ")"}]}], "    ", 
+                    "}"}], "]"}]}], "}"}], "]"}], ",", "  ", 
+                    RowBox[{"FontWeight", "\[Rule]", "Bold"}], ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}]}], ",", 
+                    "\[IndentingNewLine]", "\"\< \>\""}], "]"}], "]"}]}], 
+                 "\[IndentingNewLine]", "}"}], ",", " ", 
+                RowBox[{"Alignment", "\[Rule]", "Center"}]}], "]"}], 
+              "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+              "\[IndentingNewLine]", 
+              RowBox[{"Column", "[", 
+               RowBox[{
+                RowBox[{"{", "\[IndentingNewLine]", 
+                 RowBox[{
+                  RowBox[{"Dynamic", "[", "\[IndentingNewLine]", 
+                   RowBox[{
+                    RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{"rootDimension", "\[Equal]", "2"}], ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"Graphics", " ", "[", "  ", 
+                    RowBox[{
+                    RowBox[{"Table", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"ColorArrowDraw", "[", 
+                    RowBox[{
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+                    RowBox[{"rootColors", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}]}], "]"}], ",", " ", 
+                    RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"labelRoots", "\[Equal]", "True"}], " ", "&&", 
+                    " ", 
+                    RowBox[{"pointList", "\[NotEqual]", 
+                    RowBox[{"{", "}"}]}]}], ",", " ", 
+                    RowBox[{"Text", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"i", ",", " ", 
+                    RowBox[{"FontColor", "\[Rule]", "White"}], ",", "  ", 
+                    RowBox[{"FontWeight", "\[Rule]", "Bold"}], ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "16"}]}], "]"}], ",", " ", 
+                    RowBox[{
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}], "[", 
+                    RowBox[{"[", "1", "]"}], "]"}]}], "]"}], ",", 
+                    RowBox[{"{", "}"}]}], "]"}]}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"i", ",", "1", ",", "degree"}], "}"}]}], "]"}], 
+                    " ", ",", " ", 
+                    RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+                    RowBox[{"PlotRange", "\[Rule]", 
+                    RowBox[{"rootZoomFactor", "*", "rootRange"}]}], ",", " ", 
+                    RowBox[{"Axes", "\[Rule]", " ", "showAxes"}], ",", " ", 
+                    RowBox[{"GridLines", "\[Rule]", "Automatic"}]}], "]"}], 
+                    ",", " ", "\"\<\>\""}], "]"}], "\[IndentingNewLine]", 
+                    RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{"rootDimension", "\[Equal]", "3"}], ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"Graphics3D", " ", "[", "  ", 
+                    RowBox[{
+                    RowBox[{"Table", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"ColorArrowDraw3D", "[", 
+                    RowBox[{
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+                    RowBox[{"rootColors", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}]}], "]"}], ",", " ", 
+                    RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"labelRoots", "\[Equal]", "True"}], " ", "&&", 
+                    " ", 
+                    RowBox[{"pointList", "\[NotEqual]", 
+                    RowBox[{"{", "}"}]}]}], ",", " ", 
+                    RowBox[{"Text", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"i", ",", " ", 
+                    RowBox[{"FontColor", "\[Rule]", "Black"}], ",", "  ", 
+                    RowBox[{"FontWeight", "\[Rule]", "Bold"}], ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", " ", 
+                    RowBox[{"Append", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "i", "]"}], "]"}], "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], ",", "0"}], "]"}]}], 
+                    "]"}], ",", 
+                    RowBox[{"{", "}"}]}], "]"}]}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"i", ",", "1", ",", "degree"}], "}"}]}], "]"}], 
+                    " ", ",", " ", 
+                    RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+                    RowBox[{"PlotRange", "\[Rule]", 
+                    RowBox[{"Append", "[", 
+                    RowBox[{
+                    RowBox[{"rootZoomFactor", "*", "rootRange"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"-", "1"}], ",", "6"}], "}"}]}], "]"}]}], ",", 
+                    " ", 
+                    RowBox[{"Axes", "\[Rule]", " ", "showAxes"}]}], "]"}], 
+                    ",", " ", "\"\<\>\""}], "]"}]}], "\[IndentingNewLine]", 
+                   "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", 
+                  "\[IndentingNewLine]", 
+                  RowBox[{"Row", "[", 
+                   RowBox[{"{", "\[IndentingNewLine]", 
+                    RowBox[{
+                    RowBox[{"Button", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"\"\<Zoom in\>\"", ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", " ", 
+                    RowBox[{"rootZoomFactor", "=", " ", 
+                    RowBox[{".8", "*", " ", "rootZoomFactor"}]}]}], "]"}], 
+                    ",", "\[IndentingNewLine]", 
+                    RowBox[{"Button", "[", 
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{"\"\<Zoom out\>\"", ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], ",", " ", 
+                    RowBox[{"rootZoomFactor", " ", "=", " ", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"1", "/", ".8"}], ")"}], "*", " ", 
+                    "rootZoomFactor"}]}]}], "]"}]}], "\[IndentingNewLine]", 
+                    "}"}], "]"}], ",", "\[IndentingNewLine]", 
+                  "\[IndentingNewLine]", 
+                  RowBox[{"Dynamic", "[", 
+                   RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"pointList", "\[NotEqual]", 
+                    RowBox[{"{", "}"}]}], " ", "&&", " ", 
+                    RowBox[{"showText", "\[Equal]", "True"}]}], ",", 
+                    "\[IndentingNewLine]", 
+                    RowBox[{"Column", "[", "\[IndentingNewLine]", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Style", "[", 
+                    RowBox[{
+                    RowBox[{"Row", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"Subscript", "[", 
+                    RowBox[{"\"\<z\>\"", ",", "#"}], "]"}], " ", ",", 
+                    "\"\<=\>\"", ",", " ", 
+                    RowBox[{"SetPrecision", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Last", "[", 
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "#", "]"}], "]"}], "]"}], "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], " ", "+", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Last", "[", 
+                    RowBox[{"rootLists", "[", 
+                    RowBox[{"[", "#", "]"}], "]"}], "]"}], "[", 
+                    RowBox[{"[", "2", "]"}], "]"}], "*", "I"}]}], " ", ",", 
+                    "3"}], "]"}]}], "}"}], "]"}], ",", " ", 
+                    RowBox[{"FontColor", "\[Rule]", 
+                    RowBox[{"rootColors", "[", 
+                    RowBox[{"[", "#", "]"}], "]"}]}], ",", "  ", 
+                    RowBox[{"FontWeight", "\[Rule]", "Bold"}], ",", " ", 
+                    RowBox[{"FontSize", "\[Rule]", "20"}]}], "]"}], " ", 
+                    "&"}], "/@", " ", 
+                    RowBox[{"Range", "[", 
+                    RowBox[{"1", ",", "degree"}], "]"}]}], " ", 
+                    "\[IndentingNewLine]", "]"}], ",", " ", "\"\<\>\""}], 
+                    "]"}], "]"}]}], "\[IndentingNewLine]", "}"}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"Alignment", "\[Rule]", "Center"}]}], 
+               "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
+             "\[IndentingNewLine]", "}"}], "}"}], ",", "  ", 
+           RowBox[{"Alignment", "\[Rule]", "Top"}]}], "]"}]}], 
+        "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+        "}"}], ",", " ", 
+       RowBox[{"Alignment", "\[Rule]", "Left"}]}], "]"}], ",", 
+     "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Initialization", "\[RuleDelayed]", " ", 
+      RowBox[{"(", " ", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"ArrowPartial", "[", 
+          RowBox[{"w_", ",", " ", "m_", ",", " ", "color_"}], "]"}], ":=", 
+         " ", 
+         RowBox[{"{", 
+          RowBox[{"color", ",", " ", 
+           RowBox[{"Point", "[", 
+            RowBox[{"w", "[", 
+             RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", " ", 
+           RowBox[{"Arrow", "[", 
+            RowBox[{"w", "[", 
+             RowBox[{"[", 
+              RowBox[{"1", ";;", "m"}], "]"}], "]"}], "]"}]}], "}"}]}], ";", 
+        "\[IndentingNewLine]", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"ColorArrowDraw", "[", 
+          RowBox[{"w_", ",", " ", "color_"}], "]"}], ":=", " ", 
+         RowBox[{"Which", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"Length", "[", "w", "]"}], "==", "0"}], ",", " ", 
+           RowBox[{"{", "}"}], ",", " ", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"Length", "[", "w", "]"}], "\[Equal]", "1"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"color", ",", " ", 
+             RowBox[{"PointSize", "[", "0.03", "]"}], ",", 
+             RowBox[{"Point", "[", 
+              RowBox[{"w", "[", 
+               RowBox[{"[", "1", "]"}], "]"}], "]"}]}], "}"}], ",", 
+           "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"Length", "[", "w", "]"}], ">", "1"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"color", ",", 
+             RowBox[{"Thickness", "[", "0.007", "]"}], ",", 
+             RowBox[{"PointSize", "[", "0.03", "]"}], ",", 
+             RowBox[{"Point", "[", 
+              RowBox[{"w", "[", 
+               RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", 
+             RowBox[{"BSplineCurve", "[", "w", "]"}]}], "}"}]}], "]"}]}], ";",
+         " ", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"ColorArrowDraw3D", "[", 
+          RowBox[{"w_", ",", " ", "color_"}], "]"}], ":=", " ", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"list3d", "=", 
+            RowBox[{"{", "}"}]}], ";", "  ", 
+           RowBox[{"For", "[", 
+            RowBox[{
+             RowBox[{"k", "=", "1"}], ",", " ", 
+             RowBox[{"k", "\[LessEqual]", 
+              RowBox[{"Length", "[", "w", "]"}]}], ",", " ", 
+             RowBox[{"k", "++"}], ",", " ", 
+             RowBox[{"AppendTo", "[", 
+              RowBox[{"list3d", ",", " ", 
+               RowBox[{"Append", "[", 
+                RowBox[{
+                 RowBox[{"w", "[", 
+                  RowBox[{"[", "k", "]"}], "]"}], ",", " ", 
+                 RowBox[{"5", "*", 
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{"k", "-", "1"}], ")"}], "/", 
+                   RowBox[{"Length", "[", "w", "]"}]}]}]}], "]"}]}], "]"}]}], 
+            "]"}], ";", "\[IndentingNewLine]", 
+           RowBox[{"Which", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Length", "[", "w", "]"}], "==", "0"}], ",", " ", 
+             RowBox[{"{", "}"}], ",", " ", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"Length", "[", "w", "]"}], "\[Equal]", "1"}], ",", " ", 
+             RowBox[{"{", 
+              RowBox[{"color", ",", " ", 
+               RowBox[{"PointSize", "[", "0.02", "]"}], ",", 
+               RowBox[{"Point", "[", 
+                RowBox[{"list3d", "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], "]"}]}], "}"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"Length", "[", "w", "]"}], ">", "1"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"color", ",", 
+               RowBox[{"Thickness", "[", "0.007", "]"}], ",", 
+               RowBox[{"PointSize", "[", "0.02", "]"}], ",", 
+               RowBox[{"Point", "[", 
+                RowBox[{"list3d", "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", " ", 
+               RowBox[{"Point", "[", 
+                RowBox[{"Append", "[", 
+                 RowBox[{
+                  RowBox[{"w", "[", 
+                   RowBox[{"[", "1", "]"}], "]"}], ",", 
+                  RowBox[{"5", "*", 
+                   RowBox[{"(", 
+                    RowBox[{"1", "-", 
+                    RowBox[{"1", "/", 
+                    RowBox[{"Length", "[", "w", "]"}]}]}], ")"}]}]}], "]"}], 
+                "]"}], ",", " ", 
+               RowBox[{"BSplineCurve", "[", "list3d", "]"}]}], "}"}]}], 
+            "]"}]}], " ", ")"}]}], ";", " ", "\[IndentingNewLine]", 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"ComputeRoots", "[", 
+          RowBox[{"parameter_", ",", " ", "poly_"}], "]"}], ":=", " ", 
+         "\[IndentingNewLine]", 
+         RowBox[{"(", "\[IndentingNewLine]", "\t", 
+          RowBox[{
+           RowBox[{"subsPoly", " ", "=", " ", 
+            RowBox[{"poly", " ", "/.", " ", 
+             RowBox[{"t", "\[Rule]", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"parameter", "[", 
+                 RowBox[{"[", "1", "]"}], "]"}], "+", 
+                RowBox[{
+                 RowBox[{"parameter", "[", 
+                  RowBox[{"[", "2", "]"}], "]"}], "*", "I"}]}], ")"}]}]}]}], 
+           ";", "\[IndentingNewLine]", "\t", 
+           RowBox[{"zList", "=", 
+            RowBox[{"NSolve", "[", " ", 
+             RowBox[{
+              RowBox[{"subsPoly", "\[Equal]", "0"}], ",", " ", "z"}], "]"}]}],
+            " ", ";", "\[IndentingNewLine]", "\t", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"Re", "[", "z", "]"}], ",", " ", 
+              RowBox[{"Im", "[", "z", "]"}]}], "}"}], " ", "/.", " ", 
+            "zList"}]}], "\[IndentingNewLine]", ")"}]}]}], 
+       "\[IndentingNewLine]", " ", ")"}]}]}], "\[IndentingNewLine]", "]"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]"}]}]], "Input",
+ CellChangeTimes->{{3.744727454464613*^9, 3.744727456821323*^9}, {
+   3.74472813784717*^9, 3.744728257323772*^9}, {3.7447282901022797`*^9, 
+   3.7447284413014264`*^9}, {3.7447284922282853`*^9, 
+   3.7447285709837523`*^9}, {3.744728750369879*^9, 3.7447288199807715`*^9}, {
+   3.744728886538824*^9, 3.744728894933374*^9}, {3.74472896659581*^9, 
+   3.7447289848151073`*^9}, {3.7447293297009573`*^9, 
+   3.7447293381992936`*^9}, {3.7447293874137735`*^9, 3.744729519579384*^9}, {
+   3.744729861545789*^9, 3.7447298884369073`*^9}, {3.7447299670647564`*^9, 
+   3.7447300388338985`*^9}, {3.744730167321031*^9, 3.744730186443905*^9}, {
+   3.7447303100954*^9, 3.7447303986356955`*^9}, {3.74480408912685*^9, 
+   3.744804778118103*^9}, {3.744804817604271*^9, 3.7448048178545923`*^9}, {
+   3.744804855287527*^9, 3.744804935513071*^9}, {3.7448049699051704`*^9, 
+   3.7448049726368313`*^9}, {3.744805066074048*^9, 3.74480506771267*^9}, {
+   3.7448051396164856`*^9, 3.744805211862314*^9}, {3.744805333717945*^9, 
+   3.744805439058345*^9}, {3.7448055089963827`*^9, 3.744805515262636*^9}, {
+   3.744805546300661*^9, 3.7448055707224092`*^9}, {3.7448058693151655`*^9, 
+   3.7448059292270145`*^9}, {3.744805970964798*^9, 3.74480618776324*^9}, {
+   3.7448062337057304`*^9, 3.7448062391083326`*^9}, {3.7448062758056016`*^9, 
+   3.744806276126789*^9}, 3.744806402022398*^9, {3.7448065234501195`*^9, 
+   3.7448065858463244`*^9}, {3.744806628506279*^9, 3.7448068638581257`*^9}, {
+   3.7448069122809515`*^9, 3.74480695476832*^9}, {3.7448070500765386`*^9, 
+   3.7448070522796507`*^9}, {3.7448071241126213`*^9, 3.744807201685166*^9}, {
+   3.744807366231676*^9, 3.7448074097393703`*^9}, {3.7448074599112473`*^9, 
+   3.7448075413109055`*^9}, {3.74480757558403*^9, 3.744807585602254*^9}, {
+   3.744807672284526*^9, 3.7448076750432*^9}, {3.744807789847159*^9, 
+   3.744807790602134*^9}, {3.7448078420196915`*^9, 3.7448078834639*^9}, {
+   3.7448079175996466`*^9, 3.744807938832882*^9}, {3.744808024826993*^9, 
+   3.7448080974169436`*^9}, {3.744809120960661*^9, 3.7448091426078005`*^9}, {
+   3.7448091779603148`*^9, 3.744809252351433*^9}, {3.7448092825397224`*^9, 
+   3.7448092845812654`*^9}, {3.7448093147585955`*^9, 3.744809377758225*^9}, {
+   3.744809418401536*^9, 3.7448094553846664`*^9}, {3.7448095290028667`*^9, 
+   3.744809628187726*^9}, {3.7448101066316233`*^9, 3.744810137016349*^9}, {
+   3.7448101755604863`*^9, 3.7448101957178097`*^9}, {3.7448122882997265`*^9, 
+   3.7448123997597632`*^9}, {3.744812445303062*^9, 3.744812453603826*^9}, {
+   3.74481253365882*^9, 3.744812557959856*^9}, {3.744812688767657*^9, 
+   3.7448127245589814`*^9}, {3.744812761206012*^9, 3.7448128297837343`*^9}, {
+   3.7448128661275625`*^9, 3.7448129768814588`*^9}, {3.7448132344158554`*^9, 
+   3.744813276825489*^9}, {3.744813339629599*^9, 3.744813347333042*^9}, {
+   3.7448133903839207`*^9, 3.74481340825115*^9}, {3.7448257489796877`*^9, 
+   3.744825770251191*^9}, {3.7448258367165775`*^9, 3.744825840431099*^9}, {
+   3.7448259094452972`*^9, 3.7448261856516867`*^9}, {3.744826229071621*^9, 
+   3.744826340003559*^9}, {3.744826399114627*^9, 3.7448264208048873`*^9}, {
+   3.7448264629978285`*^9, 3.7448264652030153`*^9}, {3.744826522475034*^9, 
+   3.7448265519198904`*^9}, {3.7448266410920296`*^9, 
+   3.7448267001398096`*^9}, {3.744826744938599*^9, 3.744826755377309*^9}, {
+   3.744826893218913*^9, 3.7448268999063687`*^9}, {3.7448270026697884`*^9, 
+   3.744827032924301*^9}, {3.744827089029889*^9, 3.744827124766596*^9}, {
+   3.744828051120262*^9, 3.744828155832546*^9}, {3.744828191935358*^9, 
+   3.7448283361576796`*^9}, {3.744828410121149*^9, 3.7448284122279224`*^9}, {
+   3.7448284456628723`*^9, 3.744828461907581*^9}, {3.744829467869173*^9, 
+   3.7448294734641733`*^9}, {3.7448295417118263`*^9, 3.744829622025134*^9}, {
+   3.744829743567259*^9, 3.7448297462011747`*^9}, {3.7448298743374057`*^9, 
+   3.744829884246888*^9}, {3.744829916935508*^9, 3.744829949463579*^9}, {
+   3.744830153148087*^9, 3.744830164182592*^9}, {3.7448301956344748`*^9, 
+   3.7448301964872212`*^9}, 3.7448302553807535`*^9, {3.744830310827606*^9, 
+   3.7448304656336994`*^9}, {3.7448305120516124`*^9, 
+   3.7448305396658325`*^9}, {3.744830637253919*^9, 3.7448306600449905`*^9}, {
+   3.744830693415777*^9, 3.744830758292346*^9}, {3.744830795128874*^9, 
+   3.7448309001660876`*^9}, 3.744830941698059*^9, {3.744830988656148*^9, 
+   3.7448309987760973`*^9}, {3.7448310338543186`*^9, 3.744831070399629*^9}, {
+   3.744831139503893*^9, 3.7448312263417974`*^9}, {3.7448312727257657`*^9, 
+   3.7448313871199536`*^9}, {3.7448314255292797`*^9, 
+   3.7448314289680834`*^9}, {3.744831468358783*^9, 3.7448315493921614`*^9}, {
+   3.744831608834254*^9, 3.744831611907041*^9}, {3.7448316805266447`*^9, 
+   3.7448317834773912`*^9}, {3.7448318166736517`*^9, 
+   3.7448318835379047`*^9}, {3.7448319199835052`*^9, 3.744831923201873*^9}, {
+   3.7448319930501547`*^9, 3.7448320137617836`*^9}, {3.7448320655613136`*^9, 
+   3.7448320729715166`*^9}, {3.7448321393251247`*^9, 3.744832168497139*^9}, {
+   3.7448322471059732`*^9, 3.7448322689954824`*^9}, {3.7448325000927*^9, 
+   3.744832586744033*^9}, {3.744832640109374*^9, 3.7448327269991255`*^9}, {
+   3.744832863710636*^9, 3.74483291499454*^9}, {3.7448329498503895`*^9, 
+   3.744832957709391*^9}, {3.7448329926649356`*^9, 3.7448329933630424`*^9}, {
+   3.744833028543996*^9, 3.7448330615218763`*^9}, {3.7448331068845673`*^9, 
+   3.7448331511582575`*^9}, {3.744833181926999*^9, 3.7448331892454014`*^9}, {
+   3.7448338935989885`*^9, 3.7448339037259183`*^9}, {3.7448426691459074`*^9, 
+   3.744842742289347*^9}, {3.7448910188921747`*^9, 3.744891097181875*^9}, {
+   3.74490411272863*^9, 3.744904162567398*^9}, {3.744904227153784*^9, 
+   3.7449043012526903`*^9}, {3.7449043355839233`*^9, 
+   3.7449043825563593`*^9}, {3.7449044479924154`*^9, 
+   3.7449045635495043`*^9}, {3.745002158543989*^9, 3.745002161518995*^9}, {
+   3.7450023842555647`*^9, 3.7450024089446063`*^9}, {3.745002448063992*^9, 
+   3.745002462271033*^9}, {3.745002562258726*^9, 3.745002586645876*^9}, {
+   3.7450112403355513`*^9, 3.745011479335805*^9}, {3.74501283509859*^9, 
+   3.745013030495653*^9}, {3.7450130624674997`*^9, 3.745013062782601*^9}, {
+   3.745013167371583*^9, 3.7450132694561605`*^9}, {3.7450133040560527`*^9, 
+   3.745013731112726*^9}, {3.7450139200014095`*^9, 3.7450139437452154`*^9}, {
+   3.745014040810852*^9, 3.7450140468562813`*^9}, {3.745014197944725*^9, 
+   3.7450142485663977`*^9}, {3.745014325228547*^9, 3.745014327100054*^9}, {
+   3.745014415611607*^9, 3.745014421839992*^9}, {3.7450144529704843`*^9, 
+   3.745014453400962*^9}, {3.745014493413601*^9, 3.7450146029547606`*^9}, {
+   3.745014674333871*^9, 3.745014674925362*^9}, {3.745017205488621*^9, 
+   3.745017235941799*^9}, {3.7450173428426456`*^9, 3.7450173528998313`*^9}, {
+   3.745017434343204*^9, 3.745017440209654*^9}, {3.745017577968813*^9, 
+   3.745017662905653*^9}, {3.7450177394200535`*^9, 3.745017836319522*^9}, {
+   3.7450178943046293`*^9, 3.7450180130094213`*^9}, {3.7450180923124332`*^9, 
+   3.7450181714583344`*^9}, {3.745018214195708*^9, 3.7450183056233397`*^9}, {
+   3.745018482812503*^9, 3.745018544710538*^9}, {3.7450187191717634`*^9, 
+   3.7450189403573065`*^9}, 3.7450189734704695`*^9, {3.745019008824168*^9, 
+   3.7450190092239456`*^9}, {3.745019057196517*^9, 3.745019065717842*^9}, {
+   3.7450192834628744`*^9, 3.745019283939748*^9}, {3.7450193326163893`*^9, 
+   3.745019333858165*^9}, {3.745019380875709*^9, 3.7450194119337316`*^9}, {
+   3.745019537915997*^9, 3.745019562357171*^9}, {3.745019593284299*^9, 
+   3.745019596222926*^9}, {3.7450198008164535`*^9, 3.7450198045558043`*^9}, {
+   3.745020087722582*^9, 3.7450200908849373`*^9}, {3.745093392772027*^9, 
+   3.745093396370736*^9}, {3.7450935428229446`*^9, 3.7450935816954784`*^9}, 
+   3.745093644158139*^9, {3.74509368458613*^9, 3.7450937116733904`*^9}, {
+   3.7450938662569113`*^9, 3.7450938854484234`*^9}, {3.7450956341604347`*^9, 
+   3.745095682683036*^9}},
+ CellLabel->"In[6]:=",ExpressionUUID->"73d8d75a-b6ff-480a-8ce8-dfe0ab750607"]
+},
+WindowSize->{1500, 917},
+WindowMargins->{{-8, Automatic}, {Automatic, -8}},
+FrontEndVersion->"11.3 for Microsoft Windows (64-bit) (March 6, 2018)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 44159, 868, 3126, "Input",ExpressionUUID->"73d8d75a-b6ff-480a-8ce8-dfe0ab750607"]
+}
+]
+*)
+

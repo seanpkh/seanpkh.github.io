@@ -1,0 +1,415 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     16834,        407]
+NotebookOptionsPosition[     16288,        383]
+NotebookOutlinePosition[     16635,        398]
+CellTagsIndexPosition[     16592,        395]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Give", " ", "a", " ", "one"}], "-", 
+     RowBox[{
+     "parameter", " ", "family", " ", "of", " ", "polynomials", " ", "g_t", 
+      RowBox[{
+       RowBox[{"(", "z", ")"}], ".", " ", "The"}], " ", "polynomial", " ", 
+      "variable", " ", "is", " ", "z"}]}], ";", " ", 
+    RowBox[{
+    "the", " ", "parameter", " ", "varying", " ", "the", " ", "coefficients", 
+     " ", "is", " ", 
+     RowBox[{"t", "."}]}]}], " ", "*)"}], "\[IndentingNewLine]", " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"g", " ", ":=", 
+     RowBox[{
+      RowBox[{"z", "^", "5"}], " ", "-", " ", 
+      RowBox[{"t", "*", " ", "z"}], " ", "-", " ", "1"}]}], " ", ";"}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"g", " ", ":=", " ", 
+     RowBox[{
+      RowBox[{"z", "^", "5"}], " ", "+", " ", "1"}]}], " ", ";"}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", "  ", 
+   RowBox[{
+    RowBox[{"g", " ", ":=", " ", 
+     RowBox[{
+      RowBox[{"z", "^", "7"}], " ", "+", " ", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"t", "^", "2"}], " ", "+", " ", "1"}], ")"}], " ", 
+       RowBox[{"z", "^", "3"}]}], " ", "+", " ", 
+      RowBox[{"2", "z"}], " ", "+", " ", "3"}]}], " ", ";"}], " ", "*)"}], 
+  " ", "\[IndentingNewLine]", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"g", "  ", ":=", " ", 
+     RowBox[{
+      RowBox[{"z", "^", "2"}], "  ", "-", " ", "t"}]}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{"Compute", " ", "the", " ", "ramification", " ", "points", " ", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+       "values", " ", "of", " ", "t", " ", "such", " ", "that", " ", "g", " ",
+         "has", " ", "repeated", " ", "roots"}], ")"}], ".", " ", "In"}], " ",
+      "some", " ", "cases", " ", "it", " ", "may", " ", "be", " ", "better", 
+     " ", "to", " ", "use", " ", 
+     RowBox[{"NSolve", "."}]}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"cRamPoints", " ", ":=", "  ", 
+     RowBox[{"Solve", "[", " ", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Discriminant", "[", 
+         RowBox[{"g", ",", "z"}], "]"}], " ", "\[Equal]", " ", "0"}], ",", 
+       " ", "t"}], "]"}]}], ";", " ", 
+    RowBox[{"(*", 
+     RowBox[{
+     "Ramification", " ", "points", " ", "as", " ", "complex", " ", 
+      "numbers"}], " ", "*)"}], "\[IndentingNewLine]", 
+    RowBox[{"RamPoints", ":=", " ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"Re", "[", "t", "]"}], ",", " ", 
+        RowBox[{"Im", "[", "t", "]"}]}], "}"}], "/.", " ", "cRamPoints"}]}], 
+    ";"}], " ", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Convert", " ", "these", " ", "complex", " ", "numbers", " ", "to", " ", 
+     RowBox[{"(", 
+      RowBox[{"x", ",", "y"}], ")"}], " ", "coordinates"}], " ", "*)"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{
+    "Pick", " ", "a", " ", "base", " ", "point", " ", "to", " ", "mark", " ", 
+     "for", " ", "starting", " ", "your", " ", 
+     RowBox[{"loops", ".", " ", "You"}], " ", 
+     RowBox[{"don", "'"}], "t", " ", "want", " ", "it", " ", "to", " ", "be", 
+     " ", "too", " ", "close", " ", "to", " ", "the", " ", "ramification", 
+     " ", 
+     RowBox[{"locus", "."}]}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"BasePt", ":=", 
+    RowBox[{"{", 
+     RowBox[{"2", ",", "2"}], "}"}]}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"BaseFiber", " ", ":=", " ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"Re", "[", "z", "]"}], ",", " ", 
+        RowBox[{"Im", "[", "z", "]"}]}], "}"}], " ", "/.", " ", 
+      RowBox[{"NSolve", "[", " ", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"g", " ", "/.", " ", 
+           RowBox[{"t", "\[Rule]", " ", 
+            RowBox[{
+             RowBox[{"BasePt", "[", 
+              RowBox[{"[", "1", "]"}], "]"}], "+", 
+             RowBox[{"I", "*", 
+              RowBox[{"BasePt", "[", 
+               RowBox[{"[", "2", "]"}], "]"}]}]}]}]}], ")"}], " ", "\[Equal]",
+          " ", "0"}], ",", " ", "z"}], "]"}]}]}], ";", "  ", 
+    RowBox[{"(*", " ", 
+     RowBox[{
+     "Computes", " ", "the", " ", "roots", " ", "of", " ", "the", " ", "base",
+       " ", "point", " ", "and", " ", "sets", " ", "up", " ", "the", " ", 
+      "points", " ", "to", " ", "graph", " ", "to", " ", "mark", " ", "it"}], 
+     " ", "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+    RowBox[{"(*", " ", 
+     RowBox[{
+      RowBox[{"the", " ", 
+       RowBox[{"meat", ".", " ", "The"}], " ", "output", " ", "will", " ", 
+       "have", " ", "two", " ", 
+       RowBox[{"displays", " ", "--"}], " ", "on", " ", "the", " ", "right"}],
+       ",", " ", 
+      RowBox[{"the", " ", "complex", " ", "parameter", " ", 
+       RowBox[{"space", ".", " ", "The"}], " ", "base", " ", "point", " ", 
+       "is", " ", "marked", " ", "in", " ", "blue"}], ",", " ", 
+      RowBox[{
+      "and", " ", "the", " ", "discriminant", " ", "locus", " ", "in", " ", 
+       "red"}], ",", " ", 
+      RowBox[{
+       RowBox[{
+       "and", " ", "the", " ", "varying", " ", "point", " ", "with", " ", "a",
+         " ", "marker", " ", "which", " ", "can", " ", "be", " ", 
+        RowBox[{"dragged", ".", " ", "On"}], " ", "the", " ", "left", " ", 
+        "is", " ", "the", " ", "root", " ", "space"}], ";", " ", 
+       RowBox[{
+       "the", " ", "roots", " ", "at", " ", "the", " ", "basepoint", " ", 
+        "are", " ", "marked", " ", "in", " ", "blue"}]}], ",", " ", 
+      RowBox[{
+      "and", " ", "the", " ", "roots", " ", "above", " ", "the", " ", 
+       "current", " ", "and", " ", "past", " ", "positions", " ", "of", " ", 
+       "the", " ", "marker", " ", "in", " ", 
+       RowBox[{"black", ".", " ", "You"}], " ", "might", " ", "want", " ", 
+       "to", " ", "drag", " ", "slower", " ", "when", " ", "near", " ", 
+       "ramification", " ", 
+       RowBox[{"points", "."}]}]}], "  ", "*)"}], "\[IndentingNewLine]", 
+    "\[IndentingNewLine]", 
+    RowBox[{"DynamicModule", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"p", "=", "BasePt"}], ",", " ", 
+        RowBox[{"imList", "=", 
+         RowBox[{"{", "}"}]}], ",", " ", 
+        RowBox[{"preImList", "=", 
+         RowBox[{"{", "}"}]}]}], "}"}], ",", " ", "\[IndentingNewLine]", 
+      RowBox[{"{", " ", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Dynamic", "[", " ", 
+         RowBox[{"Refresh", "[", " ", 
+          RowBox[{
+           RowBox[{"imList", "=", 
+            RowBox[{"Union", "[", 
+             RowBox[{"imList", ",", " ", 
+              RowBox[{"{", "p", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+           "\t\t", 
+           RowBox[{"preImList", "=", 
+            RowBox[{"Union", "[", 
+             RowBox[{"preImList", ",", " ", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"Re", "[", "z", "]"}], ",", 
+                 RowBox[{"Im", "[", "z", "]"}]}], "}"}], " ", "/.", " ", 
+               RowBox[{"NSolve", "[", " ", 
+                RowBox[{
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{"g", " ", "/.", " ", 
+                    RowBox[{"t", " ", "\[Rule]", " ", 
+                    RowBox[{
+                    RowBox[{"p", "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], "+", 
+                    RowBox[{
+                    RowBox[{"p", "[", 
+                    RowBox[{"[", "2", "]"}], "]"}], "*", "I"}]}]}]}], ")"}], 
+                  "\[Equal]", " ", "0"}], ",", " ", "z"}], "]"}]}]}], "]"}]}],
+            ";", "\[IndentingNewLine]", "\t\t", 
+           RowBox[{"TrackedSymbols", "\[Rule]", "p"}], ";"}], 
+          "\[IndentingNewLine]", "\t\t", "]"}], "\[IndentingNewLine]", "\t", 
+         "]"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Graphics", "[", 
+         RowBox[{
+          RowBox[{"{", " ", "\[IndentingNewLine]", "\t", 
+           RowBox[{"Blue", ",", " ", 
+            RowBox[{"PointSize", "[", "Large", "]"}], ",", " ", 
+            RowBox[{"Point", "[", "BaseFiber", "]"}], ",", 
+            "\[IndentingNewLine]", "\t", "Black", ",", " ", 
+            RowBox[{"PointSize", "[", "Medium", "]"}], ",", " ", 
+            RowBox[{"Dynamic", "[", 
+             RowBox[{"Point", "[", " ", "preImList", "]"}], "]"}], ","}], 
+           " \t", "\[IndentingNewLine]", "}"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"ImageSize", "\[Rule]", "Medium"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"PlotRange", "\[Rule]", "All"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"Frame", "\[Rule]", "True"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"PlotLabel", "\[Rule]", "\"\<Roots\>\""}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"PlotRangePadding", "\[Rule]", 
+           RowBox[{"Scaled", "[", ".1", "]"}]}]}], "\[IndentingNewLine]", 
+         "]"}], " ", ",", "\[IndentingNewLine]", 
+        RowBox[{"Graphics", "[", " ", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"{", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"PointSize", "[", "Medium", "]"}], ",", "Red", ",", " ", 
+            RowBox[{"Point", "[", "RamPoints", "]"}], ",", 
+            "\[IndentingNewLine]", "Blue", ",", " ", 
+            RowBox[{"PointSize", "[", "Large", "]"}], ",", " ", 
+            RowBox[{"Point", "[", "BasePt", "]"}], ",", "\[IndentingNewLine]",
+             "Black", ",", " ", 
+            RowBox[{"PointSize", "[", "Medium", "]"}], ",", " ", 
+            RowBox[{"Dynamic", "[", 
+             RowBox[{"Point", "[", "imList", "]"}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"Locator", "[", 
+             RowBox[{"Dynamic", "[", "p", "]"}], "]"}], ","}], " ", 
+           "\[IndentingNewLine]", "\[IndentingNewLine]", 
+           "\[IndentingNewLine]", "}"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"ImageSize", "\[Rule]", "Medium"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"PlotRange", "\[Rule]", "All"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"Frame", "\[Rule]", "True"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"PlotLabel", "\[Rule]", "\"\<Parameter space\>\""}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"PlotRangePadding", "\[Rule]", 
+           RowBox[{"Scaled", "[", ".1", "]"}]}]}], "\[IndentingNewLine]", 
+         "]"}], ",", " ", "\[IndentingNewLine]", 
+        RowBox[{"Button", "[", 
+         RowBox[{"\"\<Clear Path!\>\"", ",", " ", 
+          RowBox[{
+           RowBox[{"imList", "=", 
+            RowBox[{"{", "}"}]}], ";", " ", 
+           RowBox[{"preImList", "=", 
+            RowBox[{"{", "}"}]}], ";", " ", 
+           RowBox[{"p", "=", "BasePt"}]}]}], "]"}]}], "\[IndentingNewLine]", 
+       "}"}]}], "\[IndentingNewLine]", "]"}]}], 
+   "\[IndentingNewLine]"}]}]], "Input",
+ CellChangeTimes->{{3.701454176788114*^9, 3.7014541893902693`*^9}, {
+   3.7014542301525507`*^9, 3.701454597175071*^9}, {3.7014546279453573`*^9, 
+   3.7014547072666464`*^9}, {3.7014547615167*^9, 3.7014547894637585`*^9}, {
+   3.7014548310584283`*^9, 3.7014548739282885`*^9}, {3.701455112195975*^9, 
+   3.7014552515865126`*^9}, {3.701455317237045*^9, 3.701455327754528*^9}, {
+   3.70145537119312*^9, 3.701455481060752*^9}, {3.7014555875380273`*^9, 
+   3.701455587807146*^9}, {3.7014556201638803`*^9, 3.7014556555905867`*^9}, {
+   3.7014556900849123`*^9, 3.701455704592985*^9}, {3.701455750479684*^9, 
+   3.701455784223339*^9}, {3.7014558644675407`*^9, 3.7014558663862996`*^9}, {
+   3.701455999689437*^9, 3.7014560279964848`*^9}, {3.7014560684696565`*^9, 
+   3.7014561047039285`*^9}, {3.701456169110566*^9, 3.7014561777567306`*^9}, {
+   3.7014562537730927`*^9, 3.7014563071533127`*^9}, {3.7014564224568415`*^9, 
+   3.701456572742228*^9}, {3.701456613371052*^9, 3.701456681736384*^9}, 
+   3.7014567368081837`*^9, {3.7034486877279887`*^9, 3.703448729858944*^9}, 
+   3.7034487633864813`*^9, {3.7034488160897703`*^9, 3.7034488477512364`*^9}, {
+   3.70344904371259*^9, 3.7034491264900045`*^9}, {3.7034491645044823`*^9, 
+   3.703449174767392*^9}}],
+
+Cell[BoxData[
+ DynamicModuleBox[{$CellContext`p$$ = {2, 2}, $CellContext`imList$$ = {{2, 
+  2}}, $CellContext`preImList$$ = {{-1.5537739740300376`, \
+-0.6435942529055825}, {1.5537739740300371`, 0.6435942529055828}}}, 
+  RowBox[{"{", 
+   RowBox[{
+    DynamicBox[ToBoxes[
+      Refresh[$CellContext`imList$$ = 
+        Union[$CellContext`imList$$, {$CellContext`p$$}]; \
+$CellContext`preImList$$ = Union[$CellContext`preImList$$, 
+          ReplaceAll[{
+            Re[$CellContext`z], 
+            Im[$CellContext`z]}, 
+           NSolve[
+           ReplaceAll[$CellContext`g, $CellContext`t -> 
+              Part[$CellContext`p$$, 1] + Part[$CellContext`p$$, 2] I] == 
+            0, $CellContext`z]]]; TrackedSymbols -> $CellContext`p$$; Null], 
+      StandardForm],
+     ImageSizeCache->{28., {0., 9.}}], ",", 
+    GraphicsBox[{
+      {RGBColor[0, 0, 1], PointSize[Large], 
+       PointBox[{{-1.5537739740300376`, -0.6435942529055825}, {
+        1.5537739740300371`, 0.6435942529055828}}]}, 
+      {GrayLevel[0], PointSize[Medium], 
+       DynamicBox[Typeset`ToBoxes[
+         Point[$CellContext`preImList$$], StandardForm, Graphics],
+        ImageSizeCache->{{55.20000000000002, 
+         327.30000000000007`}, {-60.89455633861997, 54.44899295242028}}]}},
+     Frame->True,
+     ImageSize->Medium,
+     PlotLabel->FormBox["\"Roots\"", TraditionalForm],
+     PlotRange->All,
+     PlotRangePadding->Scaled[0.1]], ",", 
+    GraphicsBox[{
+      {RGBColor[1, 0, 0], PointSize[Medium], PointBox[{{0, 0}}]}, 
+      {RGBColor[0, 0, 1], PointSize[Large], PointBox[{2, 2}]}, 
+      {GrayLevel[0], PointSize[Medium], 
+       DynamicBox[Typeset`ToBoxes[
+         Point[$CellContext`imList$$], StandardForm, Graphics],
+        ImageSizeCache->{{322.2, 326.7}, {-141.7, -137.2}}], 
+       LocatorBox[Dynamic[$CellContext`p$$]]}},
+     Frame->True,
+     ImageSize->Medium,
+     PlotLabel->FormBox["\"Parameter space\"", TraditionalForm],
+     PlotRange->All,
+     PlotRangePadding->Scaled[0.1]], ",", 
+    ButtonBox["\<\"Clear Path!\"\>",
+     Appearance->Automatic,
+     ButtonFunction:>($CellContext`imList$$ = {}; $CellContext`preImList$$ = \
+{}; $CellContext`p$$ = $CellContext`BasePt),
+     Evaluator->Automatic,
+     Method->"Preemptive"]}], "}"}],
+  DynamicModuleValues:>{}]], "Output",
+ CellChangeTimes->{
+  3.701456105274211*^9, 3.7014561788407717`*^9, 3.7014564450884485`*^9, 
+   3.7014565756797514`*^9, {3.701456738912534*^9, 3.7014567672003994`*^9}, {
+   3.7034487467086515`*^9, 3.7034487705451913`*^9}, 3.7034488376337175`*^9, 
+   3.7034490446752567`*^9, 3.7034490764516306`*^9, 3.7034491285287848`*^9, {
+   3.703449166089379*^9, 3.7034491900573854`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Discriminant", "[", 
+  RowBox[{"g", ",", "z"}], "]"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"4", " ", "t"}]], "Output",
+ CellChangeTimes->{3.7034488906967793`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Solve", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Discriminant", "[", 
+     RowBox[{"g", ",", "z"}], "]"}], "\[Equal]", "0"}], ",", " ", "t"}], 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.70344889306847*^9, 3.7034489551719723`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"t", "\[Rule]", "0"}], "}"}], "}"}]], "Output",
+ CellChangeTimes->{{3.703448946843273*^9, 3.7034489557198462`*^9}}]
+}, Open  ]]
+},
+WindowSize->{1493, 917},
+WindowMargins->{{Automatic, -1}, {Automatic, 0}},
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 12345, 269, 1114, "Input"],
+Cell[12928, 293, 2657, 58, 423, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15622, 356, 88, 2, 30, "Input"],
+Cell[15713, 360, 94, 2, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15844, 367, 254, 7, 30, "Input"],
+Cell[16101, 376, 171, 4, 30, "Output"]
+}, Open  ]]
+}
+]
+*)
+
