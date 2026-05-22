@@ -1,0 +1,3555 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Six Points to Cubic Surface</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #03040a;
+      --panel: #090b12;
+      --panel-2: #0e1019;
+      --ink: #f4f0e4;
+      --muted: #9298aa;
+      --line: #252838;
+      --accent: #e4c748;
+      --gold: #ffd86a;
+      --pair-line: #f5c437;
+      --rose: #fff0a8;
+      --green: #64e6a0;
+      --bad: #ff5f78;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #05060c;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      min-width: 250px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+      font-weight: 740;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .segmented,
+    .toggle-group {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .segmented button,
+    .toolbar-button {
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      min-height: 34px;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .segmented button + button,
+    .toolbar-button + .toolbar-button {
+      border-left: 1px solid var(--line);
+    }
+
+    .segmented button.active {
+      background: #f0ce45;
+      color: #05060c;
+    }
+
+    .toolbar-button:hover,
+    .segmented button:hover {
+      background: #171a28;
+    }
+
+    .segmented button.active:hover {
+      background: #f0ce45;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle + .toggle {
+      border-left: 1px solid var(--line);
+    }
+
+    .toggle input {
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(300px, 28vw) minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .pane {
+      position: relative;
+      min-height: 0;
+      background: var(--panel);
+    }
+
+    .surface-pane {
+      background: #02030a;
+    }
+
+    .pane + .pane {
+      border-left: 1px solid var(--line);
+    }
+
+    .pane-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 42px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .surface-pane .pane-head {
+      background: #050711;
+      border-bottom-color: #1c2135;
+    }
+
+    .surface-pane .pane-title,
+    #surfaceStatus {
+      color: #f6f2de;
+    }
+
+    .pane-title {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: var(--green);
+      box-shadow: 0 0 16px rgba(145, 209, 139, 0.4);
+    }
+
+    .status.warn::before {
+      background: var(--bad);
+      box-shadow: 0 0 16px rgba(255, 120, 110, 0.35);
+    }
+
+    #planeCanvas {
+      display: block;
+      width: 100%;
+      height: calc(100% - 150px);
+      cursor: crosshair;
+      touch-action: none;
+      background: #070911;
+    }
+
+    .point-readout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 14px;
+      height: 108px;
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+      background: #05060c;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .point-readout b {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    #surfaceMount {
+      position: absolute;
+      inset: 42px 0 0;
+      cursor: grab;
+      touch-action: none;
+      background: #02030a;
+      overflow: hidden;
+    }
+
+    #surfaceMount canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #surfaceMount::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, rgba(95, 128, 255, 0.11), transparent 22%, transparent 72%, rgba(255, 214, 90, 0.08)),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.22), transparent 45%, rgba(0, 0, 0, 0.12));
+      mix-blend-mode: screen;
+    }
+
+    #surfaceMount:active {
+      cursor: grabbing;
+    }
+
+    #surfaceMount.pan-mode {
+      cursor: move;
+    }
+
+    #surfaceMount.pan-mode:active {
+      cursor: move;
+    }
+
+    .legend {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: calc(100% - 28px);
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 216, 106, 0.24);
+      border-radius: 8px;
+      background: rgba(5, 7, 17, 0.76);
+      color: #c8cbda;
+      font-size: 12px;
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+    }
+
+    .key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .projection-key {
+      display: none;
+    }
+
+    body.projection-on .projection-key {
+      display: inline-flex;
+    }
+
+    .projection-control {
+      display: none;
+    }
+
+    body.projection-on .projection-control {
+      display: inline-flex;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 3px;
+      border-radius: 99px;
+      background: currentColor;
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .exceptional {
+      color: var(--gold);
+    }
+
+    .exceptional .swatch {
+      background: linear-gradient(90deg, #a87a12, #ffd86a);
+    }
+
+    .pair {
+      color: var(--pair-line);
+    }
+
+    .pair .swatch {
+      background: linear-gradient(90deg, #d79d16, #fff06a);
+    }
+
+    .conic {
+      color: var(--rose);
+    }
+
+    .conic .swatch {
+      background: linear-gradient(90deg, #caa85d, #fff7c7);
+    }
+
+    .ramification {
+      color: #ff6ee6;
+    }
+
+    .ramification .swatch {
+      background: linear-gradient(90deg, #ff4fde, #ffb7f3);
+    }
+
+    .projected-lines {
+      color: #ffda55;
+    }
+
+    .projected-lines .swatch {
+      background: linear-gradient(90deg, #ffb833, #fff0a8);
+    }
+
+    @media (max-width: 860px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        min-height: 100%;
+        height: auto;
+      }
+
+      .topbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .subtitle {
+        white-space: normal;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(460px, 52vh) minmax(520px, 70vh);
+      }
+
+      .pane + .pane {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body class="projection-on">
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Six Points → Cubic Surface</h1>
+        <div class="subtitle">Blow-up model with the 27 real lines</div>
+      </div>
+      <div class="toolbar">
+        <div class="segmented" aria-label="3D drag mode">
+          <button type="button" class="active" data-drag-mode="orbit">Orbit</button>
+          <button type="button" data-drag-mode="pan">Pan</button>
+          <button type="button" class="toolbar-button" id="centerViewBtn" title="Center and fit the 3D view">Center</button>
+        </div>
+        <div class="toggle-group">
+          <label class="toggle"><input type="checkbox" id="surfaceToggle" checked> Surface</label>
+          <label class="toggle"><input type="checkbox" id="lineToggle" checked> Lines</label>
+          <label class="toggle"><input type="checkbox" id="labelToggle"> Labels</label>
+          <label class="toggle"><input type="checkbox" id="gridToggle"> Grid</label>
+          <label class="toggle"><input type="checkbox" id="projectionToggle" checked> Projection</label>
+          <label class="toggle projection-control"><input type="checkbox" id="linePlaneToggle" checked> Line planes</label>
+        </div>
+        <div class="segmented">
+          <button type="button" class="toolbar-button" id="resetBtn" title="Reset the six points">Reset</button>
+          <button type="button" class="toolbar-button" id="shuffleBtn" title="Choose another general configuration">Shuffle</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="pane">
+        <div class="pane-head">
+          <span class="pane-title">Plane</span>
+          <span id="planeStatus" class="status">general position</span>
+        </div>
+        <canvas id="planeCanvas" aria-label="Six draggable points in a plane"></canvas>
+        <div class="point-readout" id="pointReadout"></div>
+      </section>
+
+      <section class="pane surface-pane">
+        <div class="pane-head">
+          <span class="pane-title">Cubic Surface</span>
+          <span id="surfaceStatus">27 lines</span>
+        </div>
+        <div id="surfaceMount"></div>
+        <div class="legend">
+          <span class="key exceptional"><span class="swatch"></span>exceptional</span>
+          <span class="key pair"><span class="swatch"></span>through pairs</span>
+          <span class="key conic"><span class="swatch"></span>through five</span>
+          <span class="key projection-key ramification"><span class="swatch"></span>quartic</span>
+          <span class="key projection-key projected-lines"><span class="swatch"></span>projected lines</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./vendor/three.min.js"></script>
+  <script>
+    const planeCanvas = document.getElementById("planeCanvas");
+    const planeCtx = planeCanvas.getContext("2d");
+    const pointReadout = document.getElementById("pointReadout");
+    const planeStatus = document.getElementById("planeStatus");
+    const surfaceStatus = document.getElementById("surfaceStatus");
+    const surfaceMount = document.getElementById("surfaceMount");
+    const surfaceToggle = document.getElementById("surfaceToggle");
+    const lineToggle = document.getElementById("lineToggle");
+    const labelToggle = document.getElementById("labelToggle");
+    const gridToggle = document.getElementById("gridToggle");
+    const projectionToggle = document.getElementById("projectionToggle");
+    const linePlaneToggle = document.getElementById("linePlaneToggle");
+    const resetBtn = document.getElementById("resetBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const centerViewBtn = document.getElementById("centerViewBtn");
+
+    const PLANE_RANGE = 2.45;
+    const EPS = 1e-8;
+    const defaultPoints = [
+      { x: -1.78, y: -1.18 },
+      { x: -0.38, y: -1.62 },
+      { x: 1.74, y: -0.76 },
+      { x: -1.46, y: 0.72 },
+      { x: 0.44, y: 1.42 },
+      { x: 0.82, y: -0.02 }
+    ];
+    const defaultProjectionPoint = { x: -0.78, y: 1.04 };
+    const goldLineColors = [
+      "#a96d06", "#b97808", "#c9860c", "#d79711", "#e5aa19", "#f0bd24",
+      "#f8cc36", "#ffda55", "#ffe577", "#fff0a3", "#b88418", "#c99827",
+      "#d9ac39", "#e8c454", "#f7dd82"
+    ];
+    const lineColorSets = {
+      exceptional: goldLineColors.slice(4, 10),
+      pair: [
+        "#a96d06", "#ba7a08", "#ca8a0d", "#db9c14", "#e8af1e",
+        "#f4c12a", "#ffd13c", "#ffdf5f", "#ffeb85", "#fff4b2",
+        "#bf8a18", "#cf9e28", "#dfb440", "#edcc63", "#fbe493"
+      ],
+      conic: goldLineColors.slice(8, 14)
+    };
+    const pointColors = Array(6).fill("#070911");
+
+    let points = clonePoints(defaultPoints);
+    let projectionPoint = { ...defaultProjectionPoint };
+    let selectedPoint = -1;
+    let viewMode = "affine";
+    let showSurface = true;
+    let showLines = true;
+    let showLineLabels = false;
+    let showReferenceGrid = false;
+    let showProjection = true;
+    let showLineProjectionPlanes = true;
+    let planeMetrics = { width: 1, height: 1, dpr: 1, cx: 0, cy: 0, scale: 1 };
+    let rebuildQueued = false;
+    let affineViewTransform = null;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x02030a);
+    scene.fog = null;
+
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
+    camera.position.set(0, 0, 14);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    if ("outputColorSpace" in renderer && THREE.SRGBColorSpace) {
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+    } else {
+      renderer.outputEncoding = THREE.sRGBEncoding;
+    }
+    if (THREE.ACESFilmicToneMapping) {
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.94;
+    }
+    surfaceMount.appendChild(renderer.domElement);
+
+    const modelRoot = new THREE.Group();
+    modelRoot.rotation.set(-0.46, 0.58, 0.04);
+    scene.add(modelRoot);
+
+    const contentRoot = new THREE.Group();
+    modelRoot.add(contentRoot);
+
+    scene.add(new THREE.HemisphereLight(0x86a8ff, 0x02030a, 0.28));
+    const keyLight = new THREE.DirectionalLight(0x78a8ff, 1.12);
+    keyLight.position.set(3.2, 4.5, 5);
+    scene.add(keyLight);
+    const rimLight = new THREE.DirectionalLight(0x7166ff, 0.9);
+    rimLight.position.set(-4, 1.5, -2.6);
+    scene.add(rimLight);
+    const warmSideLight = new THREE.DirectionalLight(0xffd45f, 0.92);
+    warmSideLight.position.set(2.4, -3.8, 2.2);
+    scene.add(warmSideLight);
+    const lowFillLight = new THREE.PointLight(0x7b3cff, 0.42, 18, 1.6);
+    lowFillLight.position.set(-2.8, -2.1, 4.5);
+    scene.add(lowFillLight);
+
+    const anchor4 = normalize([0.62, -0.28, 0.47, 0.56]);
+    const projectiveAxes = makePerpAxes(anchor4);
+
+    function hexToInt(hex) {
+      return Number.parseInt(hex.slice(1), 16);
+    }
+
+    function lineColor(type, index) {
+      const colors = lineColorSets[type] || lineColorSets.pair;
+      return colors[index % colors.length];
+    }
+
+    function lineColorInt(type, index) {
+      return hexToInt(lineColor(type, index));
+    }
+
+    function pairLineIndex(i, j) {
+      let index = 0;
+      for (let a = 0; a < i; a += 1) index += points.length - a - 1;
+      return index + j - i - 1;
+    }
+
+    const surfaceInk = new THREE.Color(0x020818);
+    const surfaceBlue = new THREE.Color(0x002cbe);
+    const surfacePurple = new THREE.Color(0x5717cf);
+    const surfaceCyan = new THREE.Color(0x32b8ff);
+
+    const surfaceTexture = makeSurfaceTexture();
+    const SurfaceMaterial = THREE.MeshPhysicalMaterial || THREE.MeshStandardMaterial;
+    const surfaceMaterialOptions = {
+      color: 0xffffff,
+      vertexColors: true,
+      transparent: false,
+      opacity: 1,
+      roughness: 0.7,
+      metalness: 0.06,
+      emissive: 0x00071f,
+      emissiveIntensity: 0.05,
+      bumpMap: surfaceTexture,
+      bumpScale: 0.018,
+      side: THREE.DoubleSide,
+      depthWrite: true
+    };
+    if (THREE.MeshPhysicalMaterial) {
+      surfaceMaterialOptions.clearcoat = 0.14;
+      surfaceMaterialOptions.clearcoatRoughness = 0.66;
+      surfaceMaterialOptions.sheen = 0.48;
+      surfaceMaterialOptions.sheenColor = new THREE.Color(0x566bff);
+      surfaceMaterialOptions.sheenRoughness = 0.64;
+    }
+    const surfaceMaterial = new SurfaceMaterial(surfaceMaterialOptions);
+
+    let orbit = {
+      dragging: false,
+      dragMode: "orbit",
+      activeDrag: "orbit",
+      lastX: 0,
+      lastY: 0,
+      distance: 14,
+      fitDistance: 14,
+      minDistance: 4.6,
+      maxDistance: 80,
+      panLimit: 12,
+      contentRadius: 4,
+      userZoomed: false,
+      userPanned: false,
+      panX: 0,
+      panY: 0
+    };
+
+    function clonePoints(source) {
+      return source.map((p) => ({ x: p.x, y: p.y }));
+    }
+
+    function makeSurfaceTexture() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext("2d");
+      const gradient = ctx.createLinearGradient(0, 0, 256, 256);
+      gradient.addColorStop(0, "#030713");
+      gradient.addColorStop(0.45, "#10134a");
+      gradient.addColorStop(1, "#2a0b48");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 256, 256);
+
+      for (let y = 0; y < 256; y += 1) {
+        for (let x = 0; x < 256; x += 1) {
+          const wave = Math.sin(x * 0.13 + y * 0.045) + Math.sin((x - y) * 0.075);
+          const grain = Math.sin(x * 2.1 + y * 0.37) * Math.sin(y * 1.27);
+          const value = 118 + wave * 24 + grain * 12;
+          ctx.fillStyle = `rgb(${value}, ${value}, ${value})`;
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(3.2, 3.2);
+      return texture;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function dot(a, b) {
+      let sum = 0;
+      for (let i = 0; i < a.length; i += 1) sum += a[i] * b[i];
+      return sum;
+    }
+
+    function norm(a) {
+      return Math.sqrt(dot(a, a));
+    }
+
+    function normalize(a) {
+      const n = norm(a);
+      return n < EPS ? a.slice() : a.map((v) => v / n);
+    }
+
+    function subtractProjection(v, basis) {
+      const out = v.slice();
+      for (const b of basis) {
+        const c = dot(out, b);
+        for (let i = 0; i < out.length; i += 1) out[i] -= c * b[i];
+      }
+      return out;
+    }
+
+    function orthonormalNullspace(rows, dimension, count) {
+      const rowBasis = [];
+      for (const row of rows) {
+        let v = subtractProjection(row, rowBasis);
+        const n = norm(v);
+        if (n > 1e-9) rowBasis.push(v.map((x) => x / n));
+      }
+
+      const basis = [];
+      for (let i = 0; i < dimension && basis.length < count; i += 1) {
+        const seed = Array(dimension).fill(0);
+        seed[i] = 1;
+        let v = subtractProjection(seed, rowBasis);
+        v = subtractProjection(v, basis);
+        const n = norm(v);
+        if (n > 1e-7) basis.push(v.map((x) => x / n));
+      }
+
+      let guard = 0;
+      while (basis.length < count && guard < 32) {
+        const seed = Array.from({ length: dimension }, (_, i) => Math.sin((i + 1) * (guard + 2.17)));
+        let v = subtractProjection(seed, rowBasis);
+        v = subtractProjection(v, basis);
+        const n = norm(v);
+        if (n > 1e-7) basis.push(v.map((x) => x / n));
+        guard += 1;
+      }
+
+      return { basis, rank: rowBasis.length };
+    }
+
+    function cubicTerms(x, y, z) {
+      return [
+        x * x * x,
+        x * x * y,
+        x * x * z,
+        x * y * y,
+        x * y * z,
+        x * z * z,
+        y * y * y,
+        y * y * z,
+        y * z * z,
+        z * z * z
+      ];
+    }
+
+    function cubicDx(x, y, z) {
+      return [
+        3 * x * x,
+        2 * x * y,
+        2 * x * z,
+        y * y,
+        y * z,
+        z * z,
+        0,
+        0,
+        0,
+        0
+      ];
+    }
+
+    function cubicDy(x, y, z) {
+      return [
+        0,
+        x * x,
+        0,
+        2 * x * y,
+        x * z,
+        0,
+        3 * y * y,
+        2 * y * z,
+        z * z,
+        0
+      ];
+    }
+
+    function conicTerms(x, y, z) {
+      return [x * x, x * y, x * z, y * y, y * z, z * z];
+    }
+
+    function evalLinearCombination(coeffs, terms) {
+      let value = 0;
+      for (let i = 0; i < coeffs.length; i += 1) value += coeffs[i] * terms[i];
+      return value;
+    }
+
+    function evalCubicMap(basis, x, y, z) {
+      const terms = cubicTerms(x, y, z);
+      return basis.map((coeffs) => evalLinearCombination(coeffs, terms));
+    }
+
+    function evalCubicDerivative(basis, terms) {
+      return basis.map((coeffs) => evalLinearCombination(coeffs, terms));
+    }
+
+    const cubic4Exponents = [
+      [3, 0, 0, 0], [2, 1, 0, 0], [2, 0, 1, 0], [2, 0, 0, 1],
+      [1, 2, 0, 0], [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 2, 0],
+      [1, 0, 1, 1], [1, 0, 0, 2], [0, 3, 0, 0], [0, 2, 1, 0],
+      [0, 2, 0, 1], [0, 1, 2, 0], [0, 1, 1, 1], [0, 1, 0, 2],
+      [0, 0, 3, 0], [0, 0, 2, 1], [0, 0, 1, 2], [0, 0, 0, 3]
+    ];
+
+    function powSmall(value, exponent) {
+      if (exponent === 0) return 1;
+      if (exponent === 1) return value;
+      if (exponent === 2) return value * value;
+      return value * value * value;
+    }
+
+    function cubic4Terms(values) {
+      return cubic4Exponents.map((exponents) => (
+        powSmall(values[0], exponents[0]) *
+        powSmall(values[1], exponents[1]) *
+        powSmall(values[2], exponents[2]) *
+        powSmall(values[3], exponents[3])
+      ));
+    }
+
+    function evalCubic4(coeffs, values) {
+      return evalLinearCombination(coeffs, cubic4Terms(values));
+    }
+
+    function evalCubic4Gradient(coeffs, values) {
+      const gradient = [0, 0, 0, 0];
+      for (let term = 0; term < cubic4Exponents.length; term += 1) {
+        const exponents = cubic4Exponents[term];
+        for (let axis = 0; axis < 4; axis += 1) {
+          if (!exponents[axis]) continue;
+          let product = exponents[axis];
+          for (let i = 0; i < 4; i += 1) {
+            product *= powSmall(values[i], exponents[i] - (i === axis ? 1 : 0));
+          }
+          gradient[axis] += coeffs[term] * product;
+        }
+      }
+      return gradient;
+    }
+
+    function smallestEigenvectorSymmetric(matrix) {
+      const n = matrix.length;
+      const a = matrix.map((row) => row.slice());
+      const vectors = Array.from({ length: n }, (_, row) => (
+        Array.from({ length: n }, (_, col) => (row === col ? 1 : 0))
+      ));
+
+      for (let iter = 0; iter < n * n * 10; iter += 1) {
+        let p = 0;
+        let q = 1;
+        let largest = 0;
+        for (let row = 0; row < n - 1; row += 1) {
+          for (let col = row + 1; col < n; col += 1) {
+            const value = Math.abs(a[row][col]);
+            if (value > largest) {
+              largest = value;
+              p = row;
+              q = col;
+            }
+          }
+        }
+        if (largest < 1e-12) break;
+
+        const app = a[p][p];
+        const aqq = a[q][q];
+        const apq = a[p][q];
+        const tau = (aqq - app) / (2 * apq);
+        const sign = tau < 0 ? -1 : 1;
+        const t = sign / (Math.abs(tau) + Math.sqrt(1 + tau * tau));
+        const c = 1 / Math.sqrt(1 + t * t);
+        const s = t * c;
+
+        for (let k = 0; k < n; k += 1) {
+          if (k === p || k === q) continue;
+          const akp = a[k][p];
+          const akq = a[k][q];
+          a[k][p] = c * akp - s * akq;
+          a[p][k] = a[k][p];
+          a[k][q] = s * akp + c * akq;
+          a[q][k] = a[k][q];
+        }
+
+        a[p][p] = c * c * app - 2 * s * c * apq + s * s * aqq;
+        a[q][q] = s * s * app + 2 * s * c * apq + c * c * aqq;
+        a[p][q] = 0;
+        a[q][p] = 0;
+
+        for (let k = 0; k < n; k += 1) {
+          const vkp = vectors[k][p];
+          const vkq = vectors[k][q];
+          vectors[k][p] = c * vkp - s * vkq;
+          vectors[k][q] = s * vkp + c * vkq;
+        }
+      }
+
+      let index = 0;
+      for (let i = 1; i < n; i += 1) {
+        if (a[i][i] < a[index][index]) index = i;
+      }
+      return normalize(vectors.map((row) => row[index]));
+    }
+
+    function leastSquaresNullVector(rows, dimension) {
+      const matrix = Array.from({ length: dimension }, () => Array(dimension).fill(0));
+      for (const row of rows) {
+        const length = norm(row);
+        if (length < 1e-12) continue;
+        for (let i = 0; i < dimension; i += 1) {
+          const ai = row[i] / length;
+          for (let j = 0; j <= i; j += 1) {
+            matrix[i][j] += ai * (row[j] / length);
+          }
+        }
+      }
+      for (let i = 0; i < dimension; i += 1) {
+        for (let j = 0; j < i; j += 1) matrix[j][i] = matrix[i][j];
+      }
+      return smallestEigenvectorSymmetric(matrix);
+    }
+
+    function makePerpAxes(anchor) {
+      const axes = [];
+      const seeds = [
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+      ];
+      for (const seed of seeds) {
+        let v = seed.slice();
+        const alongAnchor = dot(v, anchor);
+        for (let i = 0; i < 4; i += 1) v[i] -= alongAnchor * anchor[i];
+        v = subtractProjection(v, axes);
+        const n = norm(v);
+        if (n > 1e-8) axes.push(v.map((x) => x / n));
+        if (axes.length === 3) break;
+      }
+      return axes;
+    }
+
+    function makeProjector(mode) {
+      return (q) => {
+        const qn = norm(q);
+        if (!Number.isFinite(qn) || qn < 1e-10) return null;
+
+        if (mode === "compact") {
+          let u = q.map((x) => x / qn);
+          if (dot(u, anchor4) < 0) u = u.map((x) => -x);
+          return [
+            dot(u, projectiveAxes[0]),
+            dot(u, projectiveAxes[1]),
+            dot(u, projectiveAxes[2])
+          ];
+        }
+
+        const denominator = dot(q, anchor4);
+        if (Math.abs(denominator) < 0.022 * qn) return null;
+        return [
+          dot(q, projectiveAxes[0]) / denominator,
+          dot(q, projectiveAxes[1]) / denominator,
+          dot(q, projectiveAxes[2]) / denominator
+        ];
+      };
+    }
+
+    function affineChartPoint(raw) {
+      const out = anchor4.slice();
+      for (let axis = 0; axis < 3; axis += 1) {
+        for (let i = 0; i < 4; i += 1) out[i] += raw[axis] * projectiveAxes[axis][i];
+      }
+      return out;
+    }
+
+    function displayToRaw(point, transform) {
+      return [
+        transform.center[0] + point[0] / transform.scale,
+        transform.center[1] + point[1] / transform.scale,
+        transform.center[2] + point[2] / transform.scale
+      ];
+    }
+
+    function computeSurfaceEquation(basis) {
+      const rows = [];
+      const samples = [-2.1, -1.35, -0.72, -0.18, 0.32, 0.88, 1.58, 2.35];
+      for (let patch = 0; patch < 3; patch += 1) {
+        for (const u of samples) {
+          for (const v of samples) {
+            const [x, y, z] = patchCoordinate(patch, u, v);
+            const q = evalCubicMap(basis, x, y, z);
+            const qn = norm(q);
+            if (qn > 1e-10) rows.push(cubic4Terms(q.map((value) => value / qn)));
+          }
+        }
+      }
+      return leastSquaresNullVector(rows, 20);
+    }
+
+    function sampleAffineRawPositions(basis, projector) {
+      const rawPositions = [];
+      const samples = 70;
+      const span = 6.7;
+      for (let patch = 0; patch < 3; patch += 1) {
+        for (let row = 0; row <= samples; row += 1) {
+          const v = -span + (2 * span * row) / samples;
+          for (let col = 0; col <= samples; col += 1) {
+            const u = -span + (2 * span * col) / samples;
+            const [x, y, z] = patchCoordinate(patch, u, v);
+            const raw = projector(evalCubicMap(basis, x, y, z));
+            if (raw && raw.every(Number.isFinite)) rawPositions.push(raw);
+          }
+        }
+      }
+      return rawPositions;
+    }
+
+    function computeCubicBasis() {
+      const rows = points.map((p) => cubicTerms(p.x, p.y, 1));
+      return orthonormalNullspace(rows, 10, 4);
+    }
+
+    function linearlyIndependent(a, b) {
+      const an = norm(a);
+      const bn = norm(b);
+      if (an < 1e-9 || bn < 1e-9) return false;
+      const scale = dot(a, b) / dot(a, a);
+      const residual = b.map((x, i) => x - scale * a[i]);
+      return norm(residual) > 1e-6 * bn;
+    }
+
+    function pickTwoIndependent(candidates) {
+      for (let i = 0; i < candidates.length; i += 1) {
+        if (norm(candidates[i]) < 1e-9) continue;
+        for (let j = i + 1; j < candidates.length; j += 1) {
+          if (linearlyIndependent(candidates[i], candidates[j])) {
+            return [candidates[i], candidates[j]];
+          }
+        }
+      }
+      return null;
+    }
+
+    function buildLineSpans(basis) {
+      const spans = [];
+
+      for (let i = 0; i < points.length; i += 1) {
+        const p = points[i];
+        const qx = evalCubicDerivative(basis, cubicDx(p.x, p.y, 1));
+        const qy = evalCubicDerivative(basis, cubicDy(p.x, p.y, 1));
+        if (linearlyIndependent(qx, qy)) {
+          spans.push({
+            type: "exceptional",
+            index: i,
+            label: `${i + 1}`,
+            color: lineColorInt("exceptional", i),
+            a: qx,
+            b: qy
+          });
+        }
+      }
+
+      const pairSamples = [-1.15, -0.45, 0.32, 0.68, 1.45, 2.15];
+      for (let i = 0; i < points.length; i += 1) {
+        for (let j = i + 1; j < points.length; j += 1) {
+          const pi = points[i];
+          const pj = points[j];
+          const candidates = [];
+          for (const t of pairSamples) {
+            if (Math.abs(t) < 0.03 || Math.abs(t - 1) < 0.03) continue;
+            const x = pi.x + t * (pj.x - pi.x);
+            const y = pi.y + t * (pj.y - pi.y);
+            candidates.push(evalCubicMap(basis, x, y, 1));
+          }
+          const pair = pickTwoIndependent(candidates);
+          if (pair) {
+            const index = pairLineIndex(i, j);
+            spans.push({
+              type: "pair",
+              index,
+              label: `${i + 1}${j + 1}`,
+              color: lineColorInt("pair", index),
+              a: pair[0],
+              b: pair[1]
+            });
+          }
+        }
+      }
+
+      for (let omit = 0; omit < points.length; omit += 1) {
+        const throughFive = points.filter((_, index) => index !== omit);
+        const conic = computeConic(throughFive);
+        if (!conic) continue;
+        const candidates = sampleConicImage(basis, conic, throughFive[0], throughFive);
+        const pair = pickTwoIndependent(candidates);
+        if (pair) {
+          spans.push({
+            type: "conic",
+            index: omit,
+            label: `${omit + 1}'`,
+            color: lineColorInt("conic", omit),
+            a: pair[0],
+            b: pair[1]
+          });
+        }
+      }
+
+      return spans;
+    }
+
+    function computeConic(fivePoints) {
+      const rows = fivePoints.map((p) => conicTerms(p.x, p.y, 1));
+      const result = orthonormalNullspace(rows, 6, 1);
+      return result.basis[0] || null;
+    }
+
+    function conicSecondPoint(c, p0, slope) {
+      const [a, b, cx, d, e] = c;
+      const x0 = p0.x;
+      const y0 = p0.y;
+      const m = slope;
+      const A = a + b * m + d * m * m;
+      const B = 2 * a * x0 + b * (x0 * m + y0) + cx + 2 * d * y0 * m + e * m;
+      if (Math.abs(A) < 1e-10) return null;
+      const t = -B / A;
+      if (!Number.isFinite(t) || Math.abs(t) < 1e-5) return null;
+      return { x: x0 + t, y: y0 + m * t };
+    }
+
+    function conicSecondPointVertical(c, p0) {
+      const [, b, , d, e] = c;
+      const x0 = p0.x;
+      const y0 = p0.y;
+      const A = d;
+      const B = b * x0 + 2 * d * y0 + e;
+      if (Math.abs(A) < 1e-10) return null;
+      const t = -B / A;
+      if (!Number.isFinite(t) || Math.abs(t) < 1e-5) return null;
+      return { x: x0, y: y0 + t };
+    }
+
+    function farFromBasePoints(p, basePoints) {
+      for (const q of basePoints) {
+        if (Math.hypot(p.x - q.x, p.y - q.y) < 0.035) return false;
+      }
+      return Number.isFinite(p.x) && Number.isFinite(p.y) && Math.abs(p.x) < 80 && Math.abs(p.y) < 80;
+    }
+
+    function sampleConicImage(basis, conic, p0, basePoints) {
+      const slopes = [-4.2, -2.1, -0.9, -0.25, 0.38, 1.1, 2.3, 4.9];
+      const candidates = [];
+      for (const slope of slopes) {
+        const p = conicSecondPoint(conic, p0, slope);
+        if (p && farFromBasePoints(p, basePoints)) {
+          candidates.push(evalCubicMap(basis, p.x, p.y, 1));
+        }
+      }
+      const vertical = conicSecondPointVertical(conic, p0);
+      if (vertical && farFromBasePoints(vertical, basePoints)) {
+        candidates.push(evalCubicMap(basis, vertical.x, vertical.y, 1));
+      }
+      return candidates;
+    }
+
+    function median(values) {
+      if (!values.length) return 0;
+      const sorted = values.slice().sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? sorted[mid] : 0.5 * (sorted[mid - 1] + sorted[mid]);
+    }
+
+    function percentile(values, p) {
+      if (!values.length) return 0;
+      const sorted = values.slice().sort((a, b) => a - b);
+      const index = clamp(Math.floor((sorted.length - 1) * p), 0, sorted.length - 1);
+      return sorted[index];
+    }
+
+    function distance3(a, b) {
+      return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+    }
+
+    function triangleArea3(a, b, c) {
+      const abx = b[0] - a[0];
+      const aby = b[1] - a[1];
+      const abz = b[2] - a[2];
+      const acx = c[0] - a[0];
+      const acy = c[1] - a[1];
+      const acz = c[2] - a[2];
+      const cx = aby * acz - abz * acy;
+      const cy = abz * acx - abx * acz;
+      const cz = abx * acy - aby * acx;
+      return 0.5 * Math.hypot(cx, cy, cz);
+    }
+
+    function makeTransform(rawPositions, mode) {
+      if (mode === "compact") {
+        return {
+          center: [0, 0, 0],
+          scale: 4.25,
+          clip: 1000,
+          maxSurfaceEdge: 0.82,
+          maxLineStep: 0.72
+        };
+      }
+
+      if (!rawPositions.length) {
+        return {
+          center: [0, 0, 0],
+          scale: 1,
+          clip: 8,
+          maxSurfaceEdge: 1,
+          maxLineStep: 1.4
+        };
+      }
+
+      const center = [
+        median(rawPositions.map((p) => p[0])),
+        median(rawPositions.map((p) => p[1])),
+        median(rawPositions.map((p) => p[2]))
+      ];
+      const radii = rawPositions.map((p) => distance3(p, center)).filter((r) => Number.isFinite(r));
+      const p90 = Math.max(percentile(radii, 0.90), 0.35);
+      const p99 = Math.max(percentile(radii, 0.99), p90 * 1.2);
+      const scale = 3.35 / p90;
+      return {
+        center,
+        scale,
+        clip: p99 * 3.65,
+        maxSurfaceEdge: 1.35,
+        maxLineStep: 4.6
+      };
+    }
+
+    function cloneTransform(transform) {
+      return {
+        center: transform.center.slice(),
+        scale: transform.scale,
+        clip: transform.clip,
+        maxSurfaceEdge: transform.maxSurfaceEdge,
+        maxLineStep: transform.maxLineStep,
+        surfaceExtent: transform.surfaceExtent
+      };
+    }
+
+    function applyTransform(raw, transform) {
+      return [
+        (raw[0] - transform.center[0]) * transform.scale,
+        (raw[1] - transform.center[1]) * transform.scale,
+        (raw[2] - transform.center[2]) * transform.scale
+      ];
+    }
+
+    function acceptedRaw(raw, transform, margin = 1) {
+      return raw && distance3(raw, transform.center) < transform.clip * margin;
+    }
+
+    function makeSurfaceSample(q, raw) {
+      if (!raw) return null;
+      if (viewMode === "compact") return { raw, gap: 1, side: 1 };
+      const qn = norm(q);
+      const denominator = dot(q, anchor4);
+      if (!Number.isFinite(qn) || qn < 1e-10 || !Number.isFinite(denominator)) return null;
+      return {
+        raw,
+        gap: Math.abs(denominator) / qn,
+        side: Math.sign(denominator) || 1
+      };
+    }
+
+    function patchCoordinate(patchIndex, u, v) {
+      if (patchIndex === 0) return [u, v, 1];
+      if (patchIndex === 1) return [1, u, v];
+      return [u, 1, v];
+    }
+
+    function patchColor(patchIndex, y) {
+      const baseColors = [
+        new THREE.Color(0x176fb0),
+        new THREE.Color(0x4731b8),
+        new THREE.Color(0x7b2aa6)
+      ];
+      const shadowColors = [
+        new THREE.Color(0x06101f),
+        new THREE.Color(0x100b34),
+        new THREE.Color(0x21082f)
+      ];
+      const amber = new THREE.Color(0x56d6ff);
+      const t = clamp((y + 4.8) / 9.6, 0, 1);
+      const ribbon = 0.5 + 0.5 * Math.sin(y * 1.85 + patchIndex * 1.7);
+      return shadowColors[patchIndex]
+        .clone()
+        .lerp(baseColors[patchIndex], 0.5 + 0.22 * t)
+        .lerp(amber, 0.03 + 0.07 * ribbon);
+    }
+
+    function surfaceColorAt(point) {
+      const heightBlend = clamp((point[1] + 6.8) / 13.6, 0, 1);
+      const diagonalBlend = 0.5 + 0.5 * Math.sin(point[0] * 0.34 - point[2] * 0.28);
+      const contour = 0.5 + 0.5 * Math.sin(point[0] * 0.72 + point[1] * 0.18 + point[2] * 0.45);
+      const radius = clamp(Math.hypot(point[0], point[1], point[2]) / 8.4, 0, 1);
+      return surfaceInk
+        .clone()
+        .lerp(surfaceBlue, 0.36 + heightBlend * 0.32)
+        .lerp(surfacePurple, 0.16 + diagonalBlend * 0.44)
+        .lerp(surfaceCyan, (1 - radius) * (0.05 + contour * 0.12));
+    }
+
+    function affineNormalAt(point, equation, transform) {
+      const raw = displayToRaw(point, transform);
+      const q = affineChartPoint(raw);
+      const gradient4 = evalCubic4Gradient(equation, q);
+      const normal = [
+        dot(gradient4, projectiveAxes[0]),
+        dot(gradient4, projectiveAxes[1]),
+        dot(gradient4, projectiveAxes[2])
+      ];
+      const length = norm(normal);
+      return length > 1e-8 ? normal.map((value) => value / length) : [0, 1, 0];
+    }
+
+    function buildImplicitAffineSurfaceMesh(basis, transform, rawCount) {
+      const equation = computeSurfaceEquation(basis);
+      const resolution = selectedPoint >= 0 ? 38 : 56;
+      const extent = selectedPoint >= 0 ? 6.25 : 7.05;
+      transform.surfaceExtent = extent;
+      const size = resolution + 1;
+      const step = (2 * extent) / resolution;
+      const values = new Float32Array(size * size * size);
+      const coords = new Float32Array(size);
+
+      function gridIndex(x, y, z) {
+        return x + size * (y + size * z);
+      }
+
+      function implicitValue(point) {
+        const raw = displayToRaw(point, transform);
+        return evalCubic4(equation, affineChartPoint(raw));
+      }
+
+      for (let i = 0; i < size; i += 1) coords[i] = -extent + step * i;
+      for (let z = 0; z < size; z += 1) {
+        for (let y = 0; y < size; y += 1) {
+          for (let x = 0; x < size; x += 1) {
+            values[gridIndex(x, y, z)] = implicitValue([coords[x], coords[y], coords[z]]);
+          }
+        }
+      }
+
+      const positions = [];
+      const normals = [];
+      const colors = [];
+      const uvs = [];
+      const tetrahedra = [
+        [0, 1, 2, 6],
+        [0, 2, 3, 6],
+        [0, 3, 7, 6],
+        [0, 7, 4, 6],
+        [0, 4, 5, 6],
+        [0, 5, 1, 6]
+      ];
+
+      function interpolatePoint(a, b, va, vb) {
+        const denom = va - vb;
+        const t = Math.abs(denom) < 1e-12 ? 0.5 : clamp(va / denom, 0, 1);
+        return [
+          a[0] + (b[0] - a[0]) * t,
+          a[1] + (b[1] - a[1]) * t,
+          a[2] + (b[2] - a[2]) * t
+        ];
+      }
+
+      function pushVertex(point) {
+        const normal = affineNormalAt(point, equation, transform);
+        const color = surfaceColorAt(point);
+        positions.push(point[0], point[1], point[2]);
+        normals.push(normal[0], normal[1], normal[2]);
+        colors.push(color.r, color.g, color.b);
+        uvs.push(0.5 + point[0] * 0.08, 0.5 + point[2] * 0.08);
+      }
+
+      function pushTriangle(a, b, c) {
+        const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+        const ac = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+        const faceNormal = [
+          ab[1] * ac[2] - ab[2] * ac[1],
+          ab[2] * ac[0] - ab[0] * ac[2],
+          ab[0] * ac[1] - ab[1] * ac[0]
+        ];
+        const centroid = [
+          (a[0] + b[0] + c[0]) / 3,
+          (a[1] + b[1] + c[1]) / 3,
+          (a[2] + b[2] + c[2]) / 3
+        ];
+        if (dot(faceNormal, affineNormalAt(centroid, equation, transform)) < 0) {
+          pushVertex(a);
+          pushVertex(c);
+          pushVertex(b);
+          return;
+        }
+        pushVertex(a);
+        pushVertex(b);
+        pushVertex(c);
+      }
+
+      function polygonizeTetra(points4, values4) {
+        const inside = [];
+        const outside = [];
+        for (let i = 0; i < 4; i += 1) {
+          if (values4[i] <= 0) inside.push(i);
+          else outside.push(i);
+        }
+        if (!inside.length || !outside.length) return;
+
+        const edgePoint = (a, b) => interpolatePoint(points4[a], points4[b], values4[a], values4[b]);
+        if (inside.length === 1) {
+          const i = inside[0];
+          pushTriangle(edgePoint(i, outside[0]), edgePoint(i, outside[1]), edgePoint(i, outside[2]));
+        } else if (inside.length === 3) {
+          const o = outside[0];
+          pushTriangle(edgePoint(o, inside[0]), edgePoint(o, inside[1]), edgePoint(o, inside[2]));
+        } else {
+          const a = inside[0];
+          const b = inside[1];
+          const c = outside[0];
+          const d = outside[1];
+          const ac = edgePoint(a, c);
+          const ad = edgePoint(a, d);
+          const bc = edgePoint(b, c);
+          const bd = edgePoint(b, d);
+          pushTriangle(ac, bc, bd);
+          pushTriangle(ac, bd, ad);
+        }
+      }
+
+      for (let z = 0; z < resolution; z += 1) {
+        const z0 = coords[z];
+        const z1 = coords[z + 1];
+        for (let y = 0; y < resolution; y += 1) {
+          const y0 = coords[y];
+          const y1 = coords[y + 1];
+          for (let x = 0; x < resolution; x += 1) {
+            const x0 = coords[x];
+            const x1 = coords[x + 1];
+            const cubePoints = [
+              [x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0],
+              [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]
+            ];
+            const cubeValues = [
+              values[gridIndex(x, y, z)],
+              values[gridIndex(x + 1, y, z)],
+              values[gridIndex(x + 1, y + 1, z)],
+              values[gridIndex(x, y + 1, z)],
+              values[gridIndex(x, y, z + 1)],
+              values[gridIndex(x + 1, y, z + 1)],
+              values[gridIndex(x + 1, y + 1, z + 1)],
+              values[gridIndex(x, y + 1, z + 1)]
+            ];
+
+            let negative = 0;
+            let positive = 0;
+            for (const value of cubeValues) {
+              if (value <= 0) negative += 1;
+              else positive += 1;
+            }
+            if (!negative || !positive) continue;
+
+            for (const tetra of tetrahedra) {
+              polygonizeTetra(
+                tetra.map((index) => cubePoints[index]),
+                tetra.map((index) => cubeValues[index])
+              );
+            }
+          }
+        }
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+      geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+      return {
+        mesh: new THREE.Mesh(geometry, surfaceMaterial),
+        transform,
+        rawCount,
+        equation
+      };
+    }
+
+    function buildSurfaceMesh(basis, projector, transform) {
+      if (viewMode === "affine") {
+        const rawPositions = sampleAffineRawPositions(basis, projector);
+        const finalTransform = transform || makeTransform(rawPositions, viewMode);
+        return buildImplicitAffineSurfaceMesh(basis, finalTransform, rawPositions.length);
+      }
+
+      const N = viewMode === "compact" ? 66 : 188;
+      const span = viewMode === "compact" ? 1.62 : 6.7;
+      const patches = [];
+      const rawPositions = [];
+
+      for (let patch = 0; patch < 3; patch += 1) {
+        const grid = [];
+        for (let row = 0; row <= N; row += 1) {
+          const line = [];
+          const v = -span + (2 * span * row) / N;
+          for (let col = 0; col <= N; col += 1) {
+            const u = -span + (2 * span * col) / N;
+            const [x, y, z] = patchCoordinate(patch, u, v);
+            const q = evalCubicMap(basis, x, y, z);
+            const raw = projector(q);
+            if (raw && raw.every(Number.isFinite)) rawPositions.push(raw);
+            const sample = makeSurfaceSample(q, raw);
+            if (sample) {
+              const su = Math.abs(u / span);
+              const sv = Math.abs(v / span);
+              sample.domain = Math.pow(su, 4) + Math.pow(sv, 4);
+            }
+            line.push(sample);
+          }
+          grid.push(line);
+        }
+        patches.push(grid);
+      }
+
+      const finalTransform = transform || makeTransform(rawPositions, viewMode);
+      const positions = [];
+      const uvs = [];
+
+      function triangleData(a, b, c, nearBoundary) {
+        if (!a || !b || !c) return;
+        const surfaceMargin = viewMode === "affine" ? 0.86 : 1;
+        if (
+          !acceptedRaw(a.raw, finalTransform, surfaceMargin) ||
+          !acceptedRaw(b.raw, finalTransform, surfaceMargin) ||
+          !acceptedRaw(c.raw, finalTransform, surfaceMargin)
+        ) return;
+        let nearAsymptote = false;
+        let nearDomainEdge = false;
+        if (viewMode === "affine") {
+          const gap = Math.min(a.gap, b.gap, c.gap);
+          if (gap < 0.045 || a.side !== b.side || a.side !== c.side) return;
+          nearAsymptote = gap < 0.075;
+          const domain = Math.max(a.domain, b.domain, c.domain);
+          if (domain > 0.985) return;
+          nearDomainEdge = domain > 0.88;
+        }
+        const pa = applyTransform(a.raw, finalTransform);
+        const pb = applyTransform(b.raw, finalTransform);
+        const pc = applyTransform(c.raw, finalTransform);
+        const ab = distance3(pa, pb);
+        const bc = distance3(pb, pc);
+        const ca = distance3(pc, pa);
+        const longest = Math.max(ab, bc, ca);
+        const shortest = Math.max(Math.min(ab, bc, ca), 1e-6);
+        const edgeLimit = (nearBoundary || nearAsymptote || nearDomainEdge)
+          ? finalTransform.maxSurfaceEdge * 0.62
+          : finalTransform.maxSurfaceEdge;
+        if (
+          longest > edgeLimit ||
+          longest / shortest > 4.8 ||
+          triangleArea3(pa, pb, pc) / (longest * longest) < 0.026
+        ) return;
+
+        return [pa, pb, pc];
+      }
+
+      function addTriangle(triangle) {
+        const [pa, pb, pc] = triangle;
+        positions.push(...pa, ...pb, ...pc);
+        uvs.push(
+          0.5 + pa[0] * 0.11, 0.5 + pa[2] * 0.11,
+          0.5 + pb[0] * 0.11, 0.5 + pb[2] * 0.11,
+          0.5 + pc[0] * 0.11, 0.5 + pc[2] * 0.11
+        );
+      }
+
+      for (let patch = 0; patch < patches.length; patch += 1) {
+        const grid = patches[patch];
+        if (viewMode === "affine") {
+          const cells = Array.from({ length: N }, () => Array(N).fill(null));
+          for (let row = 0; row < N; row += 1) {
+            for (let col = 0; col < N; col += 1) {
+              const a = grid[row][col];
+              const b = grid[row][col + 1];
+              const c = grid[row + 1][col];
+              const d = grid[row + 1][col + 1];
+              const nearBoundary = row < 3 || col < 3 || row > N - 4 || col > N - 4;
+              const first = triangleData(a, b, c, nearBoundary);
+              const second = triangleData(b, d, c, nearBoundary);
+              if (first && second) cells[row][col] = [first, second];
+            }
+          }
+
+          for (let row = 0; row < N; row += 1) {
+            for (let col = 0; col < N; col += 1) {
+              const cell = cells[row][col];
+              if (!cell) continue;
+              let neighbors = 0;
+              for (let dr = -1; dr <= 1; dr += 1) {
+                for (let dc = -1; dc <= 1; dc += 1) {
+                  if (!dr && !dc) continue;
+                  const nearby = cells[row + dr] && cells[row + dr][col + dc];
+                  if (nearby) neighbors += 1;
+                }
+              }
+              if (neighbors < 4) continue;
+              addTriangle(cell[0]);
+              addTriangle(cell[1]);
+            }
+          }
+        } else {
+          for (let row = 0; row < N; row += 1) {
+            for (let col = 0; col < N; col += 1) {
+              const a = grid[row][col];
+              const b = grid[row][col + 1];
+              const c = grid[row + 1][col];
+              const d = grid[row + 1][col + 1];
+              const nearBoundary = row < 3 || col < 3 || row > N - 4 || col > N - 4;
+              const first = triangleData(a, b, c, nearBoundary);
+              const second = triangleData(b, d, c, nearBoundary);
+              if (first) addTriangle(first);
+              if (second) addTriangle(second);
+            }
+          }
+        }
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      const indexedPositions = [];
+      const indexedUvs = [];
+      const indexedColors = [];
+      const indices = [];
+      const vertexMap = new Map();
+      for (let i = 0; i < positions.length; i += 3) {
+        const key = `${positions[i].toFixed(6)},${positions[i + 1].toFixed(6)},${positions[i + 2].toFixed(6)}`;
+        let index = vertexMap.get(key);
+        if (index === undefined) {
+          index = indexedPositions.length / 3;
+          vertexMap.set(key, index);
+          const point = [positions[i], positions[i + 1], positions[i + 2]];
+          const color = surfaceColorAt(point);
+          indexedPositions.push(point[0], point[1], point[2]);
+          indexedColors.push(color.r, color.g, color.b);
+          indexedUvs.push(uvs[(i / 3) * 2], uvs[(i / 3) * 2 + 1]);
+        }
+        indices.push(index);
+      }
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(indexedPositions, 3));
+      geometry.setAttribute("color", new THREE.Float32BufferAttribute(indexedColors, 3));
+      geometry.setAttribute("uv", new THREE.Float32BufferAttribute(indexedUvs, 2));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+
+      return {
+        mesh: new THREE.Mesh(geometry, surfaceMaterial),
+        transform: finalTransform,
+        rawCount: rawPositions.length
+      };
+    }
+
+    function clipSegmentToBox(a, b, extent) {
+      let t0 = 0;
+      let t1 = 1;
+      for (let axis = 0; axis < 3; axis += 1) {
+        const delta = b[axis] - a[axis];
+        const min = -extent;
+        const max = extent;
+        if (Math.abs(delta) < 1e-10) {
+          if (a[axis] < min || a[axis] > max) return null;
+          continue;
+        }
+        let near = (min - a[axis]) / delta;
+        let far = (max - a[axis]) / delta;
+        if (near > far) [near, far] = [far, near];
+        t0 = Math.max(t0, near);
+        t1 = Math.min(t1, far);
+        if (t0 > t1) return null;
+      }
+
+      return [
+        [
+          a[0] + (b[0] - a[0]) * t0,
+          a[1] + (b[1] - a[1]) * t0,
+          a[2] + (b[2] - a[2]) * t0
+        ],
+        [
+          a[0] + (b[0] - a[0]) * t1,
+          a[1] + (b[1] - a[1]) * t1,
+          a[2] + (b[2] - a[2]) * t1
+        ]
+      ];
+    }
+
+    function clipLineToBox(point, direction, extent) {
+      let t0 = -Infinity;
+      let t1 = Infinity;
+      for (let axis = 0; axis < 3; axis += 1) {
+        const min = -extent;
+        const max = extent;
+        const delta = direction[axis];
+        if (Math.abs(delta) < 1e-10) {
+          if (point[axis] < min || point[axis] > max) return null;
+          continue;
+        }
+        let near = (min - point[axis]) / delta;
+        let far = (max - point[axis]) / delta;
+        if (near > far) [near, far] = [far, near];
+        t0 = Math.max(t0, near);
+        t1 = Math.min(t1, far);
+        if (t0 > t1) return null;
+      }
+
+      return [
+        [
+          point[0] + direction[0] * t0,
+          point[1] + direction[1] * t0,
+          point[2] + direction[2] * t0
+        ],
+        [
+          point[0] + direction[0] * t1,
+          point[1] + direction[1] * t1,
+          point[2] + direction[2] * t1
+        ]
+      ];
+    }
+
+    function affineLinePointFromQ(q, transform) {
+      const qn = norm(q);
+      const denominator = dot(q, anchor4);
+      if (!Number.isFinite(qn) || qn < 1e-10 || Math.abs(denominator) < 1e-8 * qn) return null;
+      const raw = [
+        dot(q, projectiveAxes[0]) / denominator,
+        dot(q, projectiveAxes[1]) / denominator,
+        dot(q, projectiveAxes[2]) / denominator
+      ];
+      if (!raw.every(Number.isFinite)) return null;
+      return applyTransform(raw, transform);
+    }
+
+    function affineSpanBoxSegment(span, transform) {
+      const candidates = [];
+      const samples = 72;
+      for (let i = 0; i < samples; i += 1) {
+        const theta = (Math.PI * i) / samples;
+        const q = span.a.map((value, index) => Math.cos(theta) * value + Math.sin(theta) * span.b[index]);
+        const point = affineLinePointFromQ(q, transform);
+        if (!point) continue;
+        if (!candidates.some((candidate) => distance3(candidate, point) < 1e-5)) {
+          candidates.push(point);
+        }
+      }
+      if (candidates.length < 2) return null;
+
+      let a = candidates[0];
+      let b = candidates[1];
+      let best = 0;
+      for (let i = 0; i < candidates.length - 1; i += 1) {
+        for (let j = i + 1; j < candidates.length; j += 1) {
+          const distance = distance3(candidates[i], candidates[j]);
+          if (distance > best) {
+            best = distance;
+            a = candidates[i];
+            b = candidates[j];
+          }
+        }
+      }
+      if (best < 1e-5) return null;
+
+      const direction = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+      return clipLineToBox(a, direction, transform.surfaceExtent || 7.05);
+    }
+
+    function curveLength(points3) {
+      let length = 0;
+      for (let i = 1; i < points3.length; i += 1) {
+        length += distance3(points3[i - 1], points3[i]);
+      }
+      return length;
+    }
+
+    function curveMidpoint(points3) {
+      if (!points3.length) return [0, 0, 0];
+      if (points3.length === 1) return points3[0].slice();
+      return curvePointAtFraction(points3, 0.5);
+    }
+
+    function curvePointAtFraction(points3, fraction) {
+      if (!points3.length) return [0, 0, 0];
+      if (points3.length === 1) return points3[0].slice();
+      const total = curveLength(points3);
+      const target = total * clamp(fraction, 0, 1);
+      let walked = 0;
+      for (let i = 1; i < points3.length; i += 1) {
+        const a = points3[i - 1];
+        const b = points3[i];
+        const segment = distance3(a, b);
+        if (walked + segment >= target) {
+          const t = segment < 1e-8 ? 0 : (target - walked) / segment;
+          return [
+            a[0] + (b[0] - a[0]) * t,
+            a[1] + (b[1] - a[1]) * t,
+            a[2] + (b[2] - a[2]) * t
+          ];
+        }
+        walked += segment;
+      }
+      return points3[points3.length - 1].slice();
+    }
+
+    function labelFraction(span) {
+      const index = span.index || 0;
+      if (span.type === "exceptional") return 0.2 + index * 0.12;
+      if (span.type === "conic") return 0.24 + index * 0.1;
+      return 0.2 + (((index * 7) % 15) / 14) * 0.62;
+    }
+
+    function labelPointsForCurves(curves, span) {
+      let bestCurve = null;
+      let bestLength = -1;
+      for (const curve of curves) {
+        const length = curveLength(curve);
+        if (length > bestLength) {
+          bestLength = length;
+          bestCurve = curve;
+        }
+      }
+      if (!bestCurve) return [];
+
+      if (viewMode === "affine" && bestCurve.length === 2) {
+        const a = bestCurve[0];
+        const b = bestCurve[1];
+        const offset = 0.52;
+        const direction = [
+          b[0] - a[0],
+          b[1] - a[1],
+          b[2] - a[2]
+        ];
+        const length = Math.max(norm(direction), 1e-8);
+        const unit = direction.map((value) => value / length);
+        return [
+          [
+            a[0] - unit[0] * offset,
+            a[1] - unit[1] * offset,
+            a[2] - unit[2] * offset
+          ],
+          [
+            b[0] + unit[0] * offset,
+            b[1] + unit[1] * offset,
+            b[2] + unit[2] * offset
+          ]
+        ];
+      }
+
+      return [curvePointAtFraction(bestCurve, labelFraction(span))];
+    }
+
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function makeLineLabelSprite(text, color) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 160;
+      canvas.height = 80;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "800 30px Inter, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const goldHex = `#${color.toString(16).padStart(6, "0")}`;
+      ctx.shadowColor = "rgba(255, 216, 106, 0.26)";
+      ctx.shadowBlur = 16;
+      ctx.fillStyle = "rgba(3, 4, 10, 0.78)";
+      drawRoundedRect(ctx, 34, 18, 92, 42, 9);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = goldHex;
+      ctx.stroke();
+
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.72)";
+      ctx.strokeText(text, 80, 42);
+      ctx.fillStyle = "#fff4b2";
+      ctx.fillText(text, 80, 42);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false
+      });
+      const sprite = new THREE.Sprite(material);
+      const scale = viewMode === "compact" ? 0.36 : 0.68;
+      sprite.scale.set(scale * 2, scale, 1);
+      sprite.renderOrder = 30;
+      sprite.userData.kind = "line-label";
+      return sprite;
+    }
+
+    function appendLineSegments(store, curveStore, span, projector, transform) {
+      if (viewMode === "affine") {
+        const segment = affineSpanBoxSegment(span, transform);
+        if (segment && distance3(segment[0], segment[1]) > 1e-5) {
+          store.push(...segment[0], ...segment[1]);
+          curveStore.push(segment);
+        }
+        return;
+      }
+
+      const samples = viewMode === "compact" ? 170 : 230;
+      let previous = null;
+      let currentCurve = [];
+
+      function finishCurve() {
+        if (currentCurve.length >= 2) {
+          curveStore.push(currentCurve);
+        }
+        currentCurve = [];
+      }
+
+      for (let i = 0; i <= samples; i += 1) {
+        const theta = (Math.PI * i) / samples;
+        const q = span.a.map((value, index) => Math.cos(theta) * value + Math.sin(theta) * span.b[index]);
+        const raw = projector(q);
+        let current = null;
+        if (raw && raw.every(Number.isFinite)) {
+          const point = applyTransform(raw, transform);
+          if (viewMode === "affine") {
+            const qn = norm(q);
+            const denominator = dot(q, anchor4);
+            if (Number.isFinite(qn) && qn > 1e-10 && Number.isFinite(denominator)) {
+              current = {
+                point,
+                side: Math.sign(denominator) || 1,
+                gap: Math.abs(denominator) / qn
+              };
+            }
+          } else if (acceptedRaw(raw, transform)) {
+            current = { point, side: 1, gap: 1 };
+          }
+        }
+
+        let segment = null;
+        if (previous && current && previous.side === current.side && previous.gap > 0.022 && current.gap > 0.022) {
+          if (viewMode === "affine") {
+            segment = clipSegmentToBox(previous.point, current.point, transform.surfaceExtent || 7.05);
+          } else if (distance3(previous.point, current.point) < transform.maxLineStep) {
+            segment = [previous.point, current.point];
+          }
+        }
+
+        if (segment) {
+          const [start, end] = segment;
+          if (distance3(start, end) < 1e-5) {
+            previous = current;
+            continue;
+          }
+          store.push(...start, ...end);
+          if (currentCurve.length && distance3(currentCurve[currentCurve.length - 1], start) > 1e-4) {
+            finishCurve();
+          }
+          if (!currentCurve.length) currentCurve.push(start);
+          currentCurve.push(end);
+        } else if (currentCurve.length) {
+          finishCurve();
+        }
+        previous = current;
+      }
+
+      finishCurve();
+    }
+
+    function addLineObjects(spans, projector, transform) {
+      for (const span of spans) {
+        const store = [];
+        const curves = [];
+        appendLineSegments(store, curves, span, projector, transform);
+        if (!store.length) continue;
+        const color = span.color || lineColorInt(span.type, span.index || 0);
+        const TubeMaterial = THREE.MeshPhysicalMaterial || THREE.MeshStandardMaterial;
+        const tubeMaterialOptions = {
+          color,
+          transparent: false,
+          opacity: 1,
+          roughness: 0.16,
+          metalness: 0.82,
+          emissive: color,
+          emissiveIntensity: 0.08,
+          depthTest: true,
+          depthWrite: false
+        };
+        if (THREE.MeshPhysicalMaterial) {
+          tubeMaterialOptions.clearcoat = 0.82;
+          tubeMaterialOptions.clearcoatRoughness = 0.12;
+        }
+        const tubeMaterial = new TubeMaterial(tubeMaterialOptions);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.18,
+          blending: THREE.AdditiveBlending,
+          depthTest: true,
+          depthWrite: false
+        });
+        const tubeRadius = viewMode === "compact" ? 0.014 : 0.043;
+        const glowRadius = tubeRadius * 2.25;
+        for (const curvePoints of curves) {
+          const vectors = curvePoints.map((p) => new THREE.Vector3(p[0], p[1], p[2]));
+          const curve = new THREE.CatmullRomCurve3(vectors);
+          const geometry = new THREE.TubeGeometry(
+            curve,
+            Math.max(6, Math.min(96, vectors.length * 2)),
+            tubeRadius,
+            6,
+            false
+          );
+          const glowGeometry = new THREE.TubeGeometry(
+            curve,
+            Math.max(6, Math.min(96, vectors.length * 2)),
+            glowRadius,
+            8,
+            false
+          );
+          const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+          glow.userData.kind = "line";
+          glow.renderOrder = 10;
+          contentRoot.add(glow);
+
+          const tube = new THREE.Mesh(geometry, tubeMaterial);
+          tube.userData.kind = "line";
+          tube.renderOrder = 11;
+          contentRoot.add(tube);
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(store, 3));
+        const material = new THREE.LineBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: true,
+          depthWrite: false
+        });
+        const lines = new THREE.LineSegments(geometry, material);
+        lines.userData.kind = "line";
+        lines.renderOrder = 12;
+        contentRoot.add(lines);
+
+        const labelPositions = labelPointsForCurves(curves, span);
+        if (showLineLabels) {
+          for (const labelPosition of labelPositions) {
+            const label = makeLineLabelSprite(span.label || "", color);
+            label.position.set(labelPosition[0], labelPosition[1], labelPosition[2]);
+            contentRoot.add(label);
+          }
+        }
+      }
+    }
+
+    function cross3(a, b) {
+      return [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+      ];
+    }
+
+    function add4(a, b) {
+      return [a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]];
+    }
+
+    function subtract4(a, b) {
+      return [a[0] - b[0], a[1] - b[1], a[2] - b[2], a[3] - b[3]];
+    }
+
+    function scale4(a, scalar) {
+      return [a[0] * scalar, a[1] * scalar, a[2] * scalar, a[3] * scalar];
+    }
+
+    function projectionDirection4(u, v, projection) {
+      return add4(
+        add4(scale4(projection.axes[0], u), scale4(projection.axes[1], v)),
+        projection.axes[2]
+      );
+    }
+
+    function projectionDirectionFromCoords(coords, projection) {
+      return add4(
+        add4(scale4(projection.axes[0], coords[0]), scale4(projection.axes[1], coords[1])),
+        scale4(projection.axes[2], coords[2])
+      );
+    }
+
+    function quotientCoords(q, projection) {
+      return [
+        dot(q, projection.axes[0]),
+        dot(q, projection.axes[1]),
+        dot(q, projection.axes[2])
+      ];
+    }
+
+    function makeProjectionData(basis, equation) {
+      const mapped = evalCubicMap(basis, projectionPoint.x, projectionPoint.y, 1);
+      const mappedNorm = norm(mapped);
+      if (!Number.isFinite(mappedNorm) || mappedNorm < 1e-9) return null;
+      const point = mapped.map((value) => value / mappedNorm);
+      return {
+        point,
+        axes: makePerpAxes(point),
+        equation,
+        gradient: evalCubic4Gradient(equation, point),
+        pointValue: evalCubic4(equation, point)
+      };
+    }
+
+    function branchQuarticValue(u, v, projection) {
+      const coeffs = projectionResidualCoefficients(u, v, projection);
+      return coeffs.quadratic * coeffs.quadratic - 4 * coeffs.linear * coeffs.cubic;
+    }
+
+    function branchQuarticValueForDirection(direction, projection) {
+      const coeffs = projectionResidualCoefficientsForDirection(direction, projection);
+      return coeffs.quadratic * coeffs.quadratic - 4 * coeffs.linear * coeffs.cubic;
+    }
+
+    function projectionResidualCoefficients(u, v, projection) {
+      const direction = projectionDirection4(u, v, projection);
+      return projectionResidualCoefficientsForDirection(direction, projection);
+    }
+
+    function projectionResidualCoefficientsForDirection(direction, projection) {
+      const plus = add4(projection.point, direction);
+      const minus = subtract4(projection.point, direction);
+      const linear = dot(projection.gradient, direction);
+      const quadratic = 0.5 * (
+        evalCubic4(projection.equation, plus) +
+        evalCubic4(projection.equation, minus)
+      ) - projection.pointValue;
+      const cubic = evalCubic4(projection.equation, direction);
+      return { direction, linear, quadratic, cubic };
+    }
+
+    function projectionPlanePoint(u, v, layout, lift = 0) {
+      return [
+        u * layout.scale,
+        layout.y + lift,
+        v * layout.scale
+      ];
+    }
+
+    function centralProjectQToFloor(q, projector, transform, layout, lift = 0) {
+      const raw = projector(q);
+      if (!raw || !raw.every(Number.isFinite)) return null;
+      const target = applyTransform(raw, transform);
+      const vertex = layout.vertex;
+      const denom = target[1] - vertex[1];
+      if (!Number.isFinite(denom) || Math.abs(denom) < 1e-8) return null;
+      const t = (layout.y + lift - vertex[1]) / denom;
+      if (!Number.isFinite(t) || Math.abs(t) > 80) return null;
+      return [
+        vertex[0] + (target[0] - vertex[0]) * t,
+        layout.y + lift,
+        vertex[2] + (target[2] - vertex[2]) * t
+      ];
+    }
+
+    function centralProjectDirectionToFloor(u, v, projection, projector, transform, layout, lift = 0) {
+      return centralProjectQToFloor(
+        projectionDirection4(u, v, projection),
+        projector,
+        transform,
+        layout,
+        lift
+      );
+    }
+
+    function projectionDirectionFromFloorPoint(point, projection, transform) {
+      const raw = displayToRaw(point, transform);
+      const q = affineChartPoint(raw);
+      return projectionDirectionFromCoords(quotientCoords(q, projection), projection);
+    }
+
+    function floorBranchValue(x, z, projection, transform, layout) {
+      return branchQuarticValueForDirection(
+        projectionDirectionFromFloorPoint([x, layout.y, z], projection, transform),
+        projection
+      );
+    }
+
+    function contourSegments2D(valueAt, domain, steps) {
+      const segments = [];
+      const step = (2 * domain) / steps;
+
+      function pointOnEdge(a, b) {
+        const denom = a.value - b.value;
+        const t = Math.abs(denom) < 1e-12 ? 0.5 : clamp(a.value / denom, 0, 1);
+        return {
+          x: a.x + (b.x - a.x) * t,
+          y: a.y + (b.y - a.y) * t
+        };
+      }
+
+      function pushHit(hits, point) {
+        if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) return;
+        if (hits.some((hit) => Math.hypot(hit.x - point.x, hit.y - point.y) < 1e-5)) return;
+        hits.push(point);
+      }
+
+      for (let row = 0; row < steps; row += 1) {
+        const y0 = -domain + row * step;
+        const y1 = y0 + step;
+        for (let col = 0; col < steps; col += 1) {
+          const x0 = -domain + col * step;
+          const x1 = x0 + step;
+          const corners = [
+            { x: x0, y: y0, value: valueAt(x0, y0) },
+            { x: x1, y: y0, value: valueAt(x1, y0) },
+            { x: x1, y: y1, value: valueAt(x1, y1) },
+            { x: x0, y: y1, value: valueAt(x0, y1) }
+          ];
+          if (corners.some((corner) => !Number.isFinite(corner.value))) continue;
+          const edges = [
+            [corners[0], corners[1]],
+            [corners[1], corners[2]],
+            [corners[2], corners[3]],
+            [corners[3], corners[0]]
+          ];
+          const hits = [];
+          for (const [a, b] of edges) {
+            if (Math.abs(a.value) < 1e-10) pushHit(hits, { x: a.x, y: a.y });
+            if (a.value === 0 || b.value === 0 || (a.value < 0) !== (b.value < 0)) {
+              pushHit(hits, pointOnEdge(a, b));
+            }
+          }
+          if (hits.length >= 2) {
+            for (let i = 0; i + 1 < hits.length; i += 2) {
+              segments.push([hits[i], hits[i + 1]]);
+            }
+          }
+        }
+      }
+
+      return segments;
+    }
+
+    function clipPlaneLineToSquare(line, domain) {
+      const [a, b, c] = line;
+      const length = Math.hypot(a, b);
+      if (!Number.isFinite(length) || length < 1e-9) return null;
+      const hits = [];
+
+      function addHit(x, y) {
+        if (
+          !Number.isFinite(x) ||
+          !Number.isFinite(y) ||
+          x < -domain - 1e-7 ||
+          x > domain + 1e-7 ||
+          y < -domain - 1e-7 ||
+          y > domain + 1e-7
+        ) return;
+        if (hits.some((hit) => Math.hypot(hit.x - x, hit.y - y) < 1e-5)) return;
+        hits.push({ x: clamp(x, -domain, domain), y: clamp(y, -domain, domain) });
+      }
+
+      if (Math.abs(b) > 1e-9) {
+        addHit(-domain, -(a * -domain + c) / b);
+        addHit(domain, -(a * domain + c) / b);
+      }
+      if (Math.abs(a) > 1e-9) {
+        addHit(-(b * -domain + c) / a, -domain);
+        addHit(-(b * domain + c) / a, domain);
+      }
+      if (hits.length < 2) return null;
+
+      let first = hits[0];
+      let second = hits[1];
+      let best = -1;
+      for (let i = 0; i < hits.length - 1; i += 1) {
+        for (let j = i + 1; j < hits.length; j += 1) {
+          const distance = Math.hypot(hits[i].x - hits[j].x, hits[i].y - hits[j].y);
+          if (distance > best) {
+            best = distance;
+            first = hits[i];
+            second = hits[j];
+          }
+        }
+      }
+
+      return [first, second];
+    }
+
+    function makePlaneStripGeometry(segments, layout, width, lift) {
+      const positions = [];
+      const indices = [];
+
+      for (const [a, b] of segments) {
+        const ax = a.x * layout.scale;
+        const az = a.y * layout.scale;
+        const bx = b.x * layout.scale;
+        const bz = b.y * layout.scale;
+        const dx = bx - ax;
+        const dz = bz - az;
+        const length = Math.hypot(dx, dz);
+        if (!Number.isFinite(length) || length < 1e-6) continue;
+        const px = (-dz / length) * width * 0.5;
+        const pz = (dx / length) * width * 0.5;
+        const base = positions.length / 3;
+        const y = layout.y + lift;
+        positions.push(
+          ax + px, y, az + pz,
+          ax - px, y, az - pz,
+          bx - px, y, bz - pz,
+          bx + px, y, bz + pz
+        );
+        indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setIndex(indices);
+      return geometry;
+    }
+
+    function makeSpaceStripGeometry(segments, width) {
+      const positions = [];
+      const indices = [];
+
+      for (const [a, b] of segments) {
+        const tangent = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+        const length = norm(tangent);
+        if (!Number.isFinite(length) || length < 1e-6) continue;
+        const unit = tangent.map((value) => value / length);
+        let side = cross3(unit, [0, 1, 0]);
+        if (norm(side) < 1e-5) side = cross3(unit, [1, 0, 0]);
+        side = normalize(side).map((value) => value * width * 0.5);
+        const base = positions.length / 3;
+        positions.push(
+          a[0] + side[0], a[1] + side[1], a[2] + side[2],
+          a[0] - side[0], a[1] - side[1], a[2] - side[2],
+          b[0] - side[0], b[1] - side[1], b[2] - side[2],
+          b[0] + side[0], b[1] + side[1], b[2] + side[2]
+        );
+        indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setIndex(indices);
+      return geometry;
+    }
+
+    function inFloorSquare(point, half, margin = 0) {
+      return point &&
+        Math.abs(point[0]) <= half + margin &&
+        Math.abs(point[2]) <= half + margin;
+    }
+
+    function clipFloorLineToSquare(a, b, half, y, lift = 0) {
+      if (!a || !b) return null;
+      const dx = b[0] - a[0];
+      const dz = b[2] - a[2];
+      if (!Number.isFinite(dx) || !Number.isFinite(dz) || Math.hypot(dx, dz) < 1e-8) return null;
+      const line = [
+        a[2] - b[2],
+        b[0] - a[0],
+        a[0] * b[2] - b[0] * a[2]
+      ];
+      const normal = Math.hypot(line[0], line[1]);
+      const segment = clipPlaneLineToSquare(line.map((value) => value / normal), half);
+      if (!segment) return null;
+      return [
+        [segment[0].x, y + lift, segment[0].y],
+        [segment[1].x, y + lift, segment[1].y]
+      ];
+    }
+
+    function oppositeConePoint(vertex, floorPoint, length) {
+      const direction = [
+        vertex[0] - floorPoint[0],
+        vertex[1] - floorPoint[1],
+        vertex[2] - floorPoint[2]
+      ];
+      const directionLength = Math.max(norm(direction), 1e-8);
+      return [
+        vertex[0] + (direction[0] / directionLength) * length,
+        vertex[1] + (direction[1] / directionLength) * length,
+        vertex[2] + (direction[2] / directionLength) * length
+      ];
+    }
+
+    function pointTowardVertex(point, vertex, distance) {
+      const direction = [
+        vertex[0] - point[0],
+        vertex[1] - point[1],
+        vertex[2] - point[2]
+      ];
+      const directionLength = Math.max(norm(direction), 1e-8);
+      return [
+        point[0] + (direction[0] / directionLength) * distance,
+        point[1] + (direction[1] / directionLength) * distance,
+        point[2] + (direction[2] / directionLength) * distance
+      ];
+    }
+
+    function ramificationSurfacePointFromDirection(direction, projection, projector, transform) {
+      const coeffs = projectionResidualCoefficientsForDirection(direction, projection);
+      if (!Number.isFinite(coeffs.cubic) || Math.abs(coeffs.cubic) < 1e-8) return null;
+      const t = -coeffs.quadratic / (2 * coeffs.cubic);
+      if (!Number.isFinite(t) || Math.abs(t) > 120) return null;
+      const q = add4(projection.point, scale4(coeffs.direction, t));
+      const raw = projector(q);
+      if (!raw || !raw.every(Number.isFinite)) return null;
+      const display = applyTransform(raw, transform);
+      const rawVertex = projector(projection.point);
+      const vertex = rawVertex ? applyTransform(rawVertex, transform) : display;
+      const ray = [
+        display[0] - vertex[0],
+        display[1] - vertex[1],
+        display[2] - vertex[2]
+      ];
+      const rayLength = Math.max(norm(ray), 1e-8);
+      const offset = 0.055;
+      return [
+        display[0] + (ray[0] / rayLength) * offset,
+        display[1] + (ray[1] / rayLength) * offset,
+        display[2] + (ray[2] / rayLength) * offset
+      ];
+    }
+
+    function ramificationSurfacePoint(u, v, projection, projector, transform) {
+      return ramificationSurfacePointFromDirection(
+        projectionDirection4(u, v, projection),
+        projection,
+        projector,
+        transform
+      );
+    }
+
+    function ramificationSurfacePointFromFloorPoint(point, projection, projector, transform) {
+      return ramificationSurfacePointFromDirection(
+        projectionDirectionFromFloorPoint(point, projection, transform),
+        projection,
+        projector,
+        transform
+      );
+    }
+
+    function markProjectionObject(object) {
+      object.userData.kind = "projection";
+      object.traverse((child) => {
+        child.userData.kind = "projection";
+      });
+      contentRoot.add(object);
+    }
+
+    function longestCurve(curves) {
+      let best = null;
+      let bestLength = 0;
+      for (const curve of curves) {
+        let length = 0;
+        for (let i = 1; i < curve.length; i += 1) {
+          length += distance3(curve[i - 1], curve[i]);
+        }
+        if (length > bestLength) {
+          best = curve;
+          bestLength = length;
+        }
+      }
+      return bestLength > 1e-5 ? best : null;
+    }
+
+    function pushProjectionSheet(positions, surfaceCurve, floorSegment) {
+      if (!surfaceCurve || surfaceCurve.length < 2 || !floorSegment) return;
+      const surfaceA = surfaceCurve[0];
+      const surfaceB = surfaceCurve[surfaceCurve.length - 1];
+      const floorA = floorSegment[0];
+      const floorB = floorSegment[1];
+      if (distance3(surfaceA, surfaceB) < 1e-5 || distance3(floorA, floorB) < 1e-5) return;
+      positions.push(
+        surfaceA[0], surfaceA[1], surfaceA[2],
+        surfaceB[0], surfaceB[1], surfaceB[2],
+        floorB[0], floorB[1], floorB[2],
+        surfaceA[0], surfaceA[1], surfaceA[2],
+        floorB[0], floorB[1], floorB[2],
+        floorA[0], floorA[1], floorA[2]
+      );
+    }
+
+    function addProjectionObjects(basis, equation, lineSpans, projector, transform) {
+      const projection = makeProjectionData(basis, equation);
+      if (!projection || projection.axes.length < 3) return;
+
+      const rawProjectionPoint = projector(projection.point);
+      if (!rawProjectionPoint) return;
+      const displayPoint = applyTransform(rawProjectionPoint, transform);
+      const extent = transform.surfaceExtent || 7.05;
+      const domain = 4.7;
+      const half = Math.min(12.8, extent * 1.56);
+      const layout = {
+        domain,
+        scale: half / domain,
+        y: Math.min(-extent - 0.72, displayPoint[1] - 2.2),
+        vertex: displayPoint
+      };
+
+      const planeGeometry = new THREE.BufferGeometry();
+      planeGeometry.setAttribute("position", new THREE.Float32BufferAttribute([
+        -half, layout.y, -half,
+        half, layout.y, -half,
+        half, layout.y, half,
+        -half, layout.y, half
+      ], 3));
+      planeGeometry.setIndex([0, 1, 2, 0, 2, 3]);
+      const planeMaterial = new THREE.MeshBasicMaterial({
+        color: 0x071126,
+        transparent: true,
+        opacity: 0.58,
+        side: THREE.DoubleSide,
+        depthTest: true,
+        depthWrite: false
+      });
+      const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.renderOrder = 3;
+      markProjectionObject(plane);
+
+      const gridSegments = [];
+      for (let i = -4; i <= 4; i += 1) {
+        const value = (domain * i) / 4;
+        gridSegments.push(
+          [{ x: value, y: -domain }, { x: value, y: domain }],
+          [{ x: -domain, y: value }, { x: domain, y: value }]
+        );
+      }
+      const gridGeometry = makePlaneStripGeometry(gridSegments, layout, 0.026, 0.018);
+      const gridMaterial = new THREE.MeshBasicMaterial({
+        color: 0x5b6dff,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.DoubleSide,
+        depthTest: true,
+        depthWrite: false
+      });
+      const grid = new THREE.Mesh(gridGeometry, gridMaterial);
+      grid.renderOrder = 4;
+      markProjectionObject(grid);
+
+      if (showLines) {
+        const bitangentSegments = [];
+        const sheetPositions = [];
+        for (const span of lineSpans) {
+          const a = centralProjectQToFloor(span.a, projector, transform, layout, 0.05);
+          const b = centralProjectQToFloor(span.b, projector, transform, layout, 0.05);
+          const segment = clipFloorLineToSquare(a, b, half, layout.y, 0.05);
+          if (!segment) continue;
+          bitangentSegments.push(segment);
+
+          if (showLineProjectionPlanes) {
+            const lineStore = [];
+            const lineCurves = [];
+            appendLineSegments(lineStore, lineCurves, span, projector, transform);
+            pushProjectionSheet(sheetPositions, longestCurve(lineCurves), segment);
+          }
+        }
+
+        if (sheetPositions.length) {
+          const sheetGeometry = new THREE.BufferGeometry();
+          sheetGeometry.setAttribute("position", new THREE.Float32BufferAttribute(sheetPositions, 3));
+          sheetGeometry.computeVertexNormals();
+          const sheetMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffe477,
+            transparent: true,
+            opacity: 0.105,
+            side: THREE.DoubleSide,
+            depthTest: true,
+            depthWrite: false
+          });
+          const sheets = new THREE.Mesh(sheetGeometry, sheetMaterial);
+          sheets.renderOrder = 5;
+          sheets.userData.projectionRole = "line-sheets";
+          markProjectionObject(sheets);
+        }
+
+        if (bitangentSegments.length) {
+          const bitangentGeometry = makeSpaceStripGeometry(bitangentSegments, 0.078);
+          const bitangentMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffda55,
+            transparent: true,
+            opacity: 0.72,
+            side: THREE.DoubleSide,
+            depthTest: true,
+            depthWrite: false
+          });
+          const bitangents = new THREE.Mesh(bitangentGeometry, bitangentMaterial);
+          bitangents.renderOrder = 6;
+          bitangents.userData.projectionRole = "bitangents";
+          markProjectionObject(bitangents);
+        }
+      }
+
+      const quarticSegments = contourSegments2D(
+        (x, z) => floorBranchValue(x, z, projection, transform, layout),
+        half,
+        184
+      );
+      const surfaceTraceSegments = [];
+      const floorQuarticSegments = [];
+      const conePositions = [];
+      for (const [a, b] of quarticSegments) {
+        const baseA = [a.x, layout.y, a.y];
+        const baseB = [b.x, layout.y, b.y];
+        const floorA = pointTowardVertex(baseA, displayPoint, 0.085);
+        const floorB = pointTowardVertex(baseB, displayPoint, 0.085);
+        if (distance3(floorA, floorB) > 1.2) continue;
+        floorQuarticSegments.push([floorA, floorB]);
+
+        const surfaceA = ramificationSurfacePointFromFloorPoint(baseA, projection, projector, transform);
+        const surfaceB = ramificationSurfacePointFromFloorPoint(baseB, projection, projector, transform);
+        if (surfaceA && surfaceB && distance3(surfaceA, surfaceB) < 1.15) {
+          surfaceTraceSegments.push([surfaceA, surfaceB]);
+        }
+
+        const coneA = pointTowardVertex(baseA, displayPoint, 0.105);
+        const coneB = pointTowardVertex(baseB, displayPoint, 0.105);
+        if (distance3(coneA, coneB) < 1.2) {
+          const oppositeLength = Math.max(extent * 2.9, half * 1.45);
+          const oppositeA = oppositeConePoint(displayPoint, coneA, oppositeLength);
+          const oppositeB = oppositeConePoint(displayPoint, coneB, oppositeLength);
+          conePositions.push(
+            displayPoint[0], displayPoint[1], displayPoint[2],
+            coneA[0], coneA[1], coneA[2],
+            coneB[0], coneB[1], coneB[2],
+            displayPoint[0], displayPoint[1], displayPoint[2],
+            oppositeB[0], oppositeB[1], oppositeB[2],
+            oppositeA[0], oppositeA[1], oppositeA[2]
+          );
+        }
+      }
+      if (floorQuarticSegments.length) {
+        const quarticGeometry = makeSpaceStripGeometry(floorQuarticSegments, 0.12);
+        const quarticMaterial = new THREE.MeshBasicMaterial({
+          color: 0xff4fde,
+          transparent: true,
+          opacity: 0.98,
+          side: THREE.DoubleSide,
+          depthTest: true,
+          depthWrite: false
+        });
+        const quartic = new THREE.Mesh(quarticGeometry, quarticMaterial);
+        quartic.renderOrder = 7;
+        quartic.userData.projectionRole = "floor-quartic";
+        markProjectionObject(quartic);
+      }
+
+      if (surfaceTraceSegments.length) {
+        const surfaceTraceGlowGeometry = makeSpaceStripGeometry(surfaceTraceSegments, 0.34);
+        const surfaceTraceGlowMaterial = new THREE.MeshBasicMaterial({
+          color: 0xff3bda,
+          transparent: true,
+          opacity: 0.22,
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+          depthTest: true,
+          depthWrite: false
+        });
+        const surfaceTraceGlow = new THREE.Mesh(surfaceTraceGlowGeometry, surfaceTraceGlowMaterial);
+        surfaceTraceGlow.renderOrder = 12;
+        surfaceTraceGlow.userData.projectionRole = "surface-trace-glow";
+        markProjectionObject(surfaceTraceGlow);
+
+        const surfaceTraceGeometry = makeSpaceStripGeometry(surfaceTraceSegments, 0.17);
+        const surfaceTraceMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffa7f1,
+          transparent: true,
+          opacity: 0.98,
+          side: THREE.DoubleSide,
+          depthTest: true,
+          depthWrite: false
+        });
+        const surfaceTrace = new THREE.Mesh(surfaceTraceGeometry, surfaceTraceMaterial);
+        surfaceTrace.renderOrder = 13;
+        surfaceTrace.userData.projectionRole = "surface-trace";
+        markProjectionObject(surfaceTrace);
+      }
+
+      if (conePositions.length) {
+        const coneGeometry = new THREE.BufferGeometry();
+        coneGeometry.setAttribute("position", new THREE.Float32BufferAttribute(conePositions, 3));
+        coneGeometry.computeVertexNormals();
+        const coneMaterial = new THREE.MeshBasicMaterial({
+          color: 0xff4fde,
+          transparent: true,
+          opacity: 0.14,
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+          depthTest: true,
+          depthWrite: false
+        });
+        const cone = new THREE.Mesh(coneGeometry, coneMaterial);
+        cone.renderOrder = 8;
+        cone.userData.projectionRole = "ramification-cone";
+        markProjectionObject(cone);
+      }
+
+      const PointMaterial = THREE.MeshStandardMaterial || THREE.MeshBasicMaterial;
+      const pointMaterial = new PointMaterial({
+        color: 0x65f2ff,
+        emissive: 0x1ccfff,
+        emissiveIntensity: 0.32,
+        roughness: 0.22,
+        metalness: 0.15,
+        depthTest: true,
+        depthWrite: false
+      });
+      const marker = new THREE.Mesh(new THREE.SphereGeometry(0.18, 18, 12), pointMaterial);
+      marker.position.set(displayPoint[0], displayPoint[1], displayPoint[2]);
+      marker.renderOrder = 14;
+      markProjectionObject(marker);
+
+      const guideGeometry = new THREE.BufferGeometry();
+      guideGeometry.setAttribute("position", new THREE.Float32BufferAttribute([
+        displayPoint[0], displayPoint[1], displayPoint[2],
+        displayPoint[0], layout.y + 0.11, displayPoint[2]
+      ], 3));
+      const guideMaterial = new THREE.LineBasicMaterial({
+        color: 0x65f2ff,
+        transparent: true,
+        opacity: 0.28,
+        depthTest: true,
+        depthWrite: false
+      });
+      const guide = new THREE.LineSegments(guideGeometry, guideMaterial);
+      guide.renderOrder = 5;
+      markProjectionObject(guide);
+    }
+
+    function addReferenceGrid(transform) {
+      const extent = transform.surfaceExtent || 7.05;
+      const step = extent / 4;
+      const gridPositions = [];
+
+      for (let i = -4; i <= 4; i += 1) {
+        const value = i * step;
+        gridPositions.push(-extent, value, 0, extent, value, 0);
+        gridPositions.push(value, -extent, 0, value, extent, 0);
+      }
+
+      const gridGeometry = new THREE.BufferGeometry();
+      gridGeometry.setAttribute("position", new THREE.Float32BufferAttribute(gridPositions, 3));
+      const gridMaterial = new THREE.LineBasicMaterial({
+        color: 0x6f80ff,
+        transparent: true,
+        opacity: 0.18,
+        depthTest: true,
+        depthWrite: false
+      });
+      const grid = new THREE.LineSegments(gridGeometry, gridMaterial);
+      grid.userData.kind = "reference";
+      grid.renderOrder = 1;
+      contentRoot.add(grid);
+
+      const axisPositions = [
+        -extent, 0, 0, extent, 0, 0,
+        0, -extent, 0, 0, extent, 0,
+        0, 0, -extent, 0, 0, extent
+      ];
+      const axisGeometry = new THREE.BufferGeometry();
+      axisGeometry.setAttribute("position", new THREE.Float32BufferAttribute(axisPositions, 3));
+      const axisMaterial = new THREE.LineBasicMaterial({
+        color: 0xffd85f,
+        transparent: true,
+        opacity: 0.5,
+        depthTest: true,
+        depthWrite: false
+      });
+      const axes = new THREE.LineSegments(axisGeometry, axisMaterial);
+      axes.userData.kind = "reference";
+      axes.renderOrder = 2;
+      contentRoot.add(axes);
+    }
+
+    function disposeObject(object) {
+      object.traverse((child) => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material && child.material !== surfaceMaterial) {
+          const disposeMaterial = (material) => {
+            if (material.map) material.map.dispose();
+            material.dispose();
+          };
+          if (Array.isArray(child.material)) child.material.forEach(disposeMaterial);
+          else disposeMaterial(child.material);
+        }
+      });
+    }
+
+    function clearModel() {
+      while (contentRoot.children.length) {
+        const child = contentRoot.children.pop();
+        disposeObject(child);
+      }
+    }
+
+    function collectGeometryPoints(kind) {
+      const points3 = [];
+
+      contentRoot.traverse((child) => {
+        if (kind && child.userData.kind !== kind) return;
+        if (!kind && (
+          child.userData.kind === "reference" ||
+          child.userData.kind === "line-label" ||
+          child.userData.kind === "projection"
+        )) return;
+        const position = child.geometry && child.geometry.getAttribute("position");
+        if (!position) return;
+        for (let i = 0; i < position.count; i += 1) {
+          const x = position.getX(i);
+          const y = position.getY(i);
+          const z = position.getZ(i);
+          if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) continue;
+          points3.push([x, y, z]);
+        }
+      });
+
+      return points3;
+    }
+
+    function centerContent() {
+      let points3 = collectGeometryPoints("surface");
+      if (points3.length < 64) points3 = collectGeometryPoints(null);
+      if (!points3.length) return 4;
+      const radiusPoints = collectGeometryPoints(null);
+
+      const trim = viewMode === "affine" ? 0.08 : 0.03;
+      const xs = points3.map((p) => p[0]);
+      const ys = points3.map((p) => p[1]);
+      const zs = points3.map((p) => p[2]);
+      const center = [
+        0.5 * (percentile(xs, trim) + percentile(xs, 1 - trim)),
+        0.5 * (percentile(ys, trim) + percentile(ys, 1 - trim)),
+        0.5 * (percentile(zs, trim) + percentile(zs, 1 - trim))
+      ];
+
+      const radii = (radiusPoints.length ? radiusPoints : points3)
+        .map((p) => Math.hypot(p[0] - center[0], p[1] - center[1], p[2] - center[2]))
+        .filter(Number.isFinite);
+      const radius = Math.max(percentile(radii, viewMode === "affine" ? 0.985 : 0.98), 1);
+
+      contentRoot.position.set(-center[0], -center[1], -center[2]);
+      return Math.max(radius, 1);
+    }
+
+    function rebuildModel() {
+      rebuildQueued = false;
+      clearModel();
+
+      const { basis, rank } = computeCubicBasis();
+      const projector = makeProjector(viewMode);
+      const lockedAffineView = viewMode === "affine" && affineViewTransform;
+      const surfaceBuild = buildSurfaceMesh(basis, projector, lockedAffineView ? affineViewTransform : null);
+      if (viewMode === "affine" && !affineViewTransform) {
+        affineViewTransform = cloneTransform(surfaceBuild.transform);
+      }
+      const lineSpans = buildLineSpans(basis);
+
+      if (showSurface) {
+        surfaceBuild.mesh.visible = true;
+        surfaceBuild.mesh.userData.kind = "surface";
+        contentRoot.add(surfaceBuild.mesh);
+      } else {
+        surfaceBuild.mesh.geometry.dispose();
+      }
+
+      if (showReferenceGrid) addReferenceGrid(surfaceBuild.transform);
+      if (showLines) addLineObjects(lineSpans, projector, surfaceBuild.transform);
+      if (showProjection) {
+        addProjectionObjects(
+          basis,
+          surfaceBuild.equation || computeSurfaceEquation(basis),
+          lineSpans,
+          projector,
+          surfaceBuild.transform
+        );
+      }
+      configureZoomForBounds(centerContent(), {
+        preserveDistance: lockedAffineView,
+        preserveUserZoom: true
+      });
+      if (!lockedAffineView && !orbit.userPanned) {
+        centerProjectedView(framingTargetNdc());
+      }
+
+      const report = analyzeConfiguration(rank, lineSpans.length);
+      planeStatus.textContent = report.message;
+      planeStatus.classList.toggle("warn", !report.ok);
+      surfaceStatus.textContent = showProjection
+        ? `${lineSpans.length} lines · projection`
+        : `${lineSpans.length} lines`;
+      if (rank < 6) surfaceStatus.textContent += " · singular data";
+    }
+
+    function scheduleRebuild() {
+      if (rebuildQueued) return;
+      rebuildQueued = true;
+      requestAnimationFrame(rebuildModel);
+    }
+
+    function analyzeConfiguration(cubicRank, lineCount) {
+      let minDistance = Infinity;
+      for (let i = 0; i < points.length; i += 1) {
+        for (let j = i + 1; j < points.length; j += 1) {
+          minDistance = Math.min(minDistance, Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y));
+        }
+      }
+
+      let minArea = Infinity;
+      for (let i = 0; i < points.length; i += 1) {
+        for (let j = i + 1; j < points.length; j += 1) {
+          for (let k = j + 1; k < points.length; k += 1) {
+            const a = points[i];
+            const b = points[j];
+            const c = points[k];
+            const area = Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
+            minArea = Math.min(minArea, area);
+          }
+        }
+      }
+
+      const conicRank = orthonormalNullspace(points.map((p) => conicTerms(p.x, p.y, 1)), 6, 1).rank;
+
+      if (minDistance < 0.12) return { ok: false, message: "coincident points" };
+      if (minArea < 0.045) return { ok: false, message: "three nearly collinear" };
+      if (conicRank < 6) return { ok: false, message: "six on a conic" };
+      if (cubicRank < 6 || lineCount < 27) return { ok: false, message: "singular configuration" };
+      return { ok: true, message: "general position" };
+    }
+
+    function resizePlaneCanvas() {
+      const rect = planeCanvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      planeCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      planeCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      planeMetrics = {
+        width: rect.width,
+        height: rect.height,
+        dpr,
+        cx: rect.width / 2,
+        cy: rect.height / 2,
+        scale: (Math.min(rect.width, rect.height) * 0.78) / (PLANE_RANGE * 2)
+      };
+      planeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawPlane();
+    }
+
+    function planeToScreen(p) {
+      return {
+        x: planeMetrics.cx + p.x * planeMetrics.scale,
+        y: planeMetrics.cy - p.y * planeMetrics.scale
+      };
+    }
+
+    function screenToPlane(x, y) {
+      return {
+        x: clamp((x - planeMetrics.cx) / planeMetrics.scale, -PLANE_RANGE, PLANE_RANGE),
+        y: clamp((planeMetrics.cy - y) / planeMetrics.scale, -PLANE_RANGE, PLANE_RANGE)
+      };
+    }
+
+    function conicValue(coeffs, x, y) {
+      return coeffs[0] * x * x +
+        coeffs[1] * x * y +
+        coeffs[2] * x +
+        coeffs[3] * y * y +
+        coeffs[4] * y +
+        coeffs[5];
+    }
+
+    function colorWithAlpha(hex, alpha) {
+      const value = Number.parseInt(hex.slice(1), 16);
+      const r = (value >> 16) & 255;
+      const g = (value >> 8) & 255;
+      const b = value & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function drawConicContour(coeffs, color) {
+      const steps = 86;
+      const min = -PLANE_RANGE;
+      const max = PLANE_RANGE;
+      const step = (max - min) / steps;
+      const scale = planeMetrics.scale;
+
+      function pointOnEdge(a, b) {
+        const denom = a.value - b.value;
+        const t = Math.abs(denom) < 1e-12 ? 0.5 : clamp(a.value / denom, 0, 1);
+        return {
+          x: a.x + (b.x - a.x) * t,
+          y: a.y + (b.y - a.y) * t
+        };
+      }
+
+      planeCtx.save();
+      planeCtx.lineWidth = 2.2;
+      planeCtx.strokeStyle = colorWithAlpha(color, 0.82);
+      planeCtx.setLineDash([8, 5]);
+      planeCtx.shadowColor = colorWithAlpha(color, 0.5);
+      planeCtx.shadowBlur = 12;
+      planeCtx.beginPath();
+
+      for (let row = 0; row < steps; row += 1) {
+        const y0 = min + row * step;
+        const y1 = y0 + step;
+        for (let col = 0; col < steps; col += 1) {
+          const x0 = min + col * step;
+          const x1 = x0 + step;
+          const corners = [
+            { x: x0, y: y0, value: conicValue(coeffs, x0, y0) },
+            { x: x1, y: y0, value: conicValue(coeffs, x1, y0) },
+            { x: x1, y: y1, value: conicValue(coeffs, x1, y1) },
+            { x: x0, y: y1, value: conicValue(coeffs, x0, y1) }
+          ];
+          const edges = [
+            [corners[0], corners[1]],
+            [corners[1], corners[2]],
+            [corners[2], corners[3]],
+            [corners[3], corners[0]]
+          ];
+          const hits = [];
+
+          for (const [a, b] of edges) {
+            if (Math.abs(a.value) < 1e-10) hits.push({ x: a.x, y: a.y });
+            if (a.value === 0 || b.value === 0 || (a.value < 0) !== (b.value < 0)) {
+              hits.push(pointOnEdge(a, b));
+            }
+          }
+
+          if (hits.length >= 2) {
+            for (let i = 0; i + 1 < hits.length; i += 2) {
+              const a = hits[i];
+              const b = hits[i + 1];
+              planeCtx.moveTo(a.x * scale, -a.y * scale);
+              planeCtx.lineTo(b.x * scale, -b.y * scale);
+            }
+          }
+        }
+      }
+
+      planeCtx.stroke();
+      planeCtx.restore();
+    }
+
+    function drawPlaneConics() {
+      for (let omit = 0; omit < points.length; omit += 1) {
+        const throughFive = points.filter((_, index) => index !== omit);
+        const conic = computeConic(throughFive);
+        if (conic) drawConicContour(conic, lineColor("conic", omit));
+      }
+    }
+
+    function drawPlane() {
+      const { width, height, cx, cy, scale } = planeMetrics;
+      planeCtx.clearRect(0, 0, width, height);
+      planeCtx.fillStyle = "#070911";
+      planeCtx.fillRect(0, 0, width, height);
+
+      planeCtx.save();
+      planeCtx.translate(cx, cy);
+      planeCtx.lineWidth = 1;
+
+      for (let value = -PLANE_RANGE; value <= PLANE_RANGE + 1e-6; value += 0.5) {
+        const alpha = Math.abs(value) < 1e-6 ? 0.34 : 0.13;
+        planeCtx.strokeStyle = `rgba(127, 139, 194, ${alpha})`;
+        planeCtx.beginPath();
+        planeCtx.moveTo(value * scale, -PLANE_RANGE * scale);
+        planeCtx.lineTo(value * scale, PLANE_RANGE * scale);
+        planeCtx.stroke();
+        planeCtx.beginPath();
+        planeCtx.moveTo(-PLANE_RANGE * scale, -value * scale);
+        planeCtx.lineTo(PLANE_RANGE * scale, -value * scale);
+        planeCtx.stroke();
+      }
+
+      planeCtx.lineWidth = 1.2;
+      for (let i = 0; i < points.length; i += 1) {
+        for (let j = i + 1; j < points.length; j += 1) {
+          const a = points[i];
+          const b = points[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const length = Math.hypot(dx, dy) || 1;
+          const ux = dx / length;
+          const uy = dy / length;
+          planeCtx.strokeStyle = colorWithAlpha(lineColor("pair", pairLineIndex(i, j)), 0.56);
+          planeCtx.beginPath();
+          planeCtx.moveTo((a.x - ux * 5) * scale, -(a.y - uy * 5) * scale);
+          planeCtx.lineTo((a.x + ux * 5) * scale, -(a.y + uy * 5) * scale);
+          planeCtx.stroke();
+        }
+      }
+
+      drawPlaneConics();
+
+      planeCtx.restore();
+
+      points.forEach((point, index) => {
+        const s = planeToScreen(point);
+        const active = index === selectedPoint;
+        planeCtx.beginPath();
+        planeCtx.arc(s.x, s.y, active ? 13 : 10, 0, Math.PI * 2);
+        planeCtx.fillStyle = pointColors[index];
+        planeCtx.fill();
+        planeCtx.lineWidth = active ? 4 : 2.4;
+        planeCtx.strokeStyle = active ? "#fff4b2" : "#f0ce45";
+        planeCtx.stroke();
+
+        planeCtx.fillStyle = "#fff4b2";
+        planeCtx.font = "700 11px Inter, system-ui, sans-serif";
+        planeCtx.textAlign = "center";
+        planeCtx.textBaseline = "middle";
+        planeCtx.fillText(String(index + 1), s.x, s.y + 0.5);
+      });
+
+      if (showProjection) {
+        const s = planeToScreen(projectionPoint);
+        const active = selectedPoint === 6;
+        planeCtx.save();
+        planeCtx.shadowColor = "rgba(101, 242, 255, 0.5)";
+        planeCtx.shadowBlur = active ? 20 : 14;
+        planeCtx.beginPath();
+        planeCtx.arc(s.x, s.y, active ? 14 : 11, 0, Math.PI * 2);
+        planeCtx.fillStyle = "#06151d";
+        planeCtx.fill();
+        planeCtx.lineWidth = active ? 4 : 2.6;
+        planeCtx.strokeStyle = active ? "#d8fcff" : "#65f2ff";
+        planeCtx.stroke();
+        planeCtx.shadowBlur = 0;
+        planeCtx.fillStyle = "#d8fcff";
+        planeCtx.font = "800 11px Inter, system-ui, sans-serif";
+        planeCtx.textAlign = "center";
+        planeCtx.textBaseline = "middle";
+        planeCtx.fillText("7", s.x, s.y + 0.5);
+        planeCtx.restore();
+      }
+
+      updateReadout();
+    }
+
+    function updateReadout() {
+      const displayedPoints = showProjection ? points.concat([projectionPoint]) : points;
+      pointReadout.innerHTML = displayedPoints
+        .map((p, index) => `<span><b>P${index + 1}</b> (${p.x.toFixed(2)}, ${p.y.toFixed(2)})</span>`)
+        .join("");
+    }
+
+    function canvasPointerPosition(event) {
+      const rect = planeCanvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    }
+
+    planeCanvas.addEventListener("pointerdown", (event) => {
+      const pos = canvasPointerPosition(event);
+      let nearest = -1;
+      let best = 22;
+      points.forEach((point, index) => {
+        const s = planeToScreen(point);
+        const d = Math.hypot(s.x - pos.x, s.y - pos.y);
+        if (d < best) {
+          best = d;
+          nearest = index;
+        }
+      });
+      if (showProjection) {
+        const s = planeToScreen(projectionPoint);
+        const d = Math.hypot(s.x - pos.x, s.y - pos.y);
+        if (d < best) nearest = 6;
+      }
+      if (nearest >= 0) {
+        selectedPoint = nearest;
+        planeCanvas.setPointerCapture(event.pointerId);
+        drawPlane();
+      }
+    });
+
+    planeCanvas.addEventListener("pointermove", (event) => {
+      if (selectedPoint < 0) return;
+      const pos = canvasPointerPosition(event);
+      if (selectedPoint === 6) projectionPoint = screenToPlane(pos.x, pos.y);
+      else points[selectedPoint] = screenToPlane(pos.x, pos.y);
+      drawPlane();
+      scheduleRebuild();
+    });
+
+    function releasePlanePointer(event) {
+      if (selectedPoint >= 0 && planeCanvas.hasPointerCapture(event.pointerId)) {
+        planeCanvas.releasePointerCapture(event.pointerId);
+      }
+      selectedPoint = -1;
+      drawPlane();
+      scheduleRebuild();
+    }
+
+    planeCanvas.addEventListener("pointerup", releasePlanePointer);
+    planeCanvas.addEventListener("pointercancel", releasePlanePointer);
+
+    function resizeRenderer() {
+      const rect = surfaceMount.getBoundingClientRect();
+      renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
+      camera.aspect = Math.max(1, rect.width) / Math.max(1, rect.height);
+      camera.updateProjectionMatrix();
+      configureZoomForBounds(orbit.contentRadius, { preserveUserZoom: true });
+      if (!orbit.userPanned) centerProjectedView(framingTargetNdc());
+    }
+
+    function setCameraDistance(distance) {
+      orbit.distance = clamp(distance, orbit.minDistance, orbit.maxDistance);
+      camera.position.z = orbit.distance;
+    }
+
+    function fitDistanceForRadius(radius) {
+      const verticalFov = (camera.fov * Math.PI) / 180;
+      const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(camera.aspect, 0.1));
+      const limitingFov = Math.max(0.1, Math.min(verticalFov, horizontalFov));
+      const minimumFit = viewMode === "affine"
+        ? (camera.aspect < 0.85 ? 54 : 38)
+        : 8;
+      const maximumFit = viewMode === "affine" ? 110 : 70;
+      return clamp(radius / Math.sin(limitingFov / 2) * 1.14, minimumFit, maximumFit);
+    }
+
+    function configureZoomForBounds(radius, options = {}) {
+      orbit.contentRadius = Math.max(radius || orbit.contentRadius || 4, 1);
+      orbit.fitDistance = fitDistanceForRadius(orbit.contentRadius);
+      orbit.minDistance = Math.max(3.4, orbit.fitDistance * 0.22);
+      orbit.maxDistance = Math.max(80, orbit.fitDistance * 6);
+      orbit.panLimit = Math.max(12, orbit.contentRadius * 5, orbit.maxDistance * 0.35);
+
+      if (options.preserveDistance || (options.preserveUserZoom && orbit.userZoomed)) {
+        setCameraDistance(orbit.distance);
+      } else {
+        setCameraDistance(orbit.fitDistance);
+      }
+    }
+
+    function updateViewPan() {
+      modelRoot.position.set(orbit.panX, orbit.panY, 0);
+    }
+
+    const projectionScratch = new THREE.Vector3();
+    const projectedCenterScratch = new THREE.Vector3();
+    const projectedTargetScratch = new THREE.Vector3();
+
+    function framingTargetNdc() {
+      return { x: 0, y: 0 };
+    }
+
+    function projectedContentBounds() {
+      const surfacePoints = [];
+      const linePoints = [];
+
+      scene.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
+      contentRoot.traverse((child) => {
+        if (
+          child.userData.kind === "reference" ||
+          child.userData.kind === "line-label" ||
+          child.userData.kind === "projection"
+        ) return;
+        const position = child.geometry && child.geometry.getAttribute("position");
+        if (!position) return;
+        const points = child.userData.kind === "surface" ? surfacePoints : linePoints;
+        for (let i = 0; i < position.count; i += 1) {
+          projectionScratch.fromBufferAttribute(position, i);
+          child.localToWorld(projectionScratch);
+          const depth = camera.position.z - projectionScratch.z;
+          projectionScratch.project(camera);
+          if (
+            !Number.isFinite(projectionScratch.x) ||
+            !Number.isFinite(projectionScratch.y) ||
+            !Number.isFinite(projectionScratch.z) ||
+            projectionScratch.z < -1 ||
+            projectionScratch.z > 1
+          ) continue;
+
+          points.push({
+            x: projectionScratch.x,
+            y: projectionScratch.y,
+            z: projectionScratch.z,
+            depth: Math.max(depth, 0.1)
+          });
+        }
+      });
+
+      const points = surfacePoints.length >= 64 ? surfacePoints : surfacePoints.concat(linePoints);
+      if (!points.length) return null;
+
+      const xs = points.map((p) => p.x);
+      const ys = points.map((p) => p.y);
+      const trim = viewMode === "affine" ? 0.08 : 0.035;
+      const bounds = {
+        minX: percentile(xs, trim),
+        minY: percentile(ys, trim),
+        maxX: percentile(xs, 1 - trim),
+        maxY: percentile(ys, 1 - trim),
+        totalDepth: 0,
+        totalZ: 0,
+        count: points.length,
+        usedSurfaceOnly: surfacePoints.length >= 64
+      };
+
+      for (const point of points) {
+        bounds.totalDepth += point.depth;
+        bounds.totalZ += point.z;
+      }
+
+      bounds.centerX = 0.5 * (bounds.minX + bounds.maxX);
+      bounds.centerY = 0.5 * (bounds.minY + bounds.maxY);
+      bounds.depth = bounds.totalDepth / points.length;
+      bounds.z = bounds.totalZ / points.length;
+      return bounds;
+    }
+
+    function centerProjectedView(target = { x: 0, y: 0 }) {
+      updateViewPan();
+      for (let step = 0; step < 6; step += 1) {
+        const bounds = projectedContentBounds();
+        const errorX = bounds ? bounds.centerX - target.x : 0;
+        const errorY = bounds ? bounds.centerY - target.y : 0;
+        if (!bounds || Math.hypot(errorX, errorY) < 0.002) break;
+
+        const originalX = orbit.panX;
+        const originalY = orbit.panY;
+        const epsilon = Math.max(0.04, orbit.distance * 0.002);
+
+        orbit.panX = originalX + epsilon;
+        orbit.panY = originalY;
+        updateViewPan();
+        const xProbe = projectedContentBounds();
+
+        orbit.panX = originalX;
+        orbit.panY = originalY + epsilon;
+        updateViewPan();
+        const yProbe = projectedContentBounds();
+
+        orbit.panX = originalX;
+        orbit.panY = originalY;
+
+        if (!xProbe || !yProbe) break;
+
+        const dxx = (xProbe.centerX - bounds.centerX) / epsilon;
+        const dyx = (xProbe.centerY - bounds.centerY) / epsilon;
+        const dxy = (yProbe.centerX - bounds.centerX) / epsilon;
+        const dyy = (yProbe.centerY - bounds.centerY) / epsilon;
+        const determinant = dxx * dyy - dxy * dyx;
+        let deltaX;
+        let deltaY;
+
+        if (Math.abs(determinant) > 1e-8) {
+          deltaX = (-errorX * dyy + errorY * dxy) / determinant;
+          deltaY = (-dxx * errorY + dyx * errorX) / determinant;
+        } else {
+          projectedCenterScratch.set(bounds.centerX, bounds.centerY, bounds.z).unproject(camera);
+          projectedTargetScratch.set(target.x, target.y, bounds.z).unproject(camera);
+          deltaX = projectedTargetScratch.x - projectedCenterScratch.x;
+          deltaY = projectedTargetScratch.y - projectedCenterScratch.y;
+        }
+
+        if (!Number.isFinite(deltaX) || !Number.isFinite(deltaY)) break;
+        orbit.panX = clamp(originalX + deltaX, -orbit.panLimit, orbit.panLimit);
+        orbit.panY = clamp(originalY + deltaY, -orbit.panLimit, orbit.panLimit);
+        updateViewPan();
+      }
+    }
+
+    function panUnitsPerPixel() {
+      const rect = surfaceMount.getBoundingClientRect();
+      const visibleHeight = 2 * Math.tan((camera.fov * Math.PI) / 360) * orbit.distance;
+      return visibleHeight / Math.max(1, rect.height);
+    }
+
+    function setDragMode(mode) {
+      orbit.dragMode = mode;
+      surfaceMount.classList.toggle("pan-mode", mode === "pan");
+      document.querySelectorAll("[data-drag-mode]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.dragMode === mode);
+      });
+    }
+
+    function centerView() {
+      orbit.panX = 0;
+      orbit.panY = 0;
+      orbit.userZoomed = false;
+      orbit.userPanned = false;
+      updateViewPan();
+      if (viewMode === "affine") {
+        affineViewTransform = null;
+        scheduleRebuild();
+      } else {
+        configureZoomForBounds(centerContent());
+        setCameraDistance(orbit.fitDistance);
+        centerProjectedView(framingTargetNdc());
+      }
+    }
+
+    surfaceMount.addEventListener("pointerdown", (event) => {
+      orbit.dragging = true;
+      orbit.activeDrag = event.shiftKey ? "pan" : orbit.dragMode;
+      orbit.lastX = event.clientX;
+      orbit.lastY = event.clientY;
+      surfaceMount.setPointerCapture(event.pointerId);
+    });
+
+    surfaceMount.addEventListener("pointermove", (event) => {
+      if (!orbit.dragging) return;
+      const dx = event.clientX - orbit.lastX;
+      const dy = event.clientY - orbit.lastY;
+      orbit.lastX = event.clientX;
+      orbit.lastY = event.clientY;
+      if (orbit.activeDrag === "pan") {
+        const units = panUnitsPerPixel();
+        orbit.panX = clamp(orbit.panX + dx * units, -orbit.panLimit, orbit.panLimit);
+        orbit.panY = clamp(orbit.panY - dy * units, -orbit.panLimit, orbit.panLimit);
+        orbit.userPanned = true;
+        updateViewPan();
+      } else {
+        modelRoot.rotation.y += dx * 0.008;
+        modelRoot.rotation.x += dy * 0.008;
+        modelRoot.rotation.x = clamp(modelRoot.rotation.x, -Math.PI * 0.72, Math.PI * 0.72);
+      }
+    });
+
+    function releaseSurfacePointer(event) {
+      orbit.dragging = false;
+      if (surfaceMount.hasPointerCapture(event.pointerId)) surfaceMount.releasePointerCapture(event.pointerId);
+    }
+
+    surfaceMount.addEventListener("pointerup", releaseSurfacePointer);
+    surfaceMount.addEventListener("pointercancel", releaseSurfacePointer);
+
+    surfaceMount.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      orbit.userZoomed = true;
+      setCameraDistance(orbit.distance * Math.exp(event.deltaY * 0.0012));
+      if (!orbit.userPanned) centerProjectedView(framingTargetNdc());
+    }, { passive: false });
+
+    document.querySelectorAll("[data-drag-mode]").forEach((button) => {
+      button.addEventListener("click", () => setDragMode(button.dataset.dragMode));
+    });
+
+    centerViewBtn.addEventListener("click", centerView);
+
+    surfaceToggle.addEventListener("change", () => {
+      showSurface = surfaceToggle.checked;
+      scheduleRebuild();
+    });
+
+    lineToggle.addEventListener("change", () => {
+      showLines = lineToggle.checked;
+      scheduleRebuild();
+    });
+
+    labelToggle.addEventListener("change", () => {
+      showLineLabels = labelToggle.checked;
+      scheduleRebuild();
+    });
+
+    gridToggle.addEventListener("change", () => {
+      showReferenceGrid = gridToggle.checked;
+      scheduleRebuild();
+    });
+
+    projectionToggle.addEventListener("change", () => {
+      showProjection = projectionToggle.checked;
+      document.body.classList.toggle("projection-on", showProjection);
+      drawPlane();
+      scheduleRebuild();
+    });
+
+    linePlaneToggle.addEventListener("change", () => {
+      showLineProjectionPlanes = linePlaneToggle.checked;
+      scheduleRebuild();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      points = clonePoints(defaultPoints);
+      projectionPoint = { ...defaultProjectionPoint };
+      orbit.userZoomed = false;
+      orbit.userPanned = false;
+      orbit.panX = 0;
+      orbit.panY = 0;
+      affineViewTransform = null;
+      updateViewPan();
+      drawPlane();
+      scheduleRebuild();
+    });
+
+    shuffleBtn.addEventListener("click", () => {
+      points = randomGeneralPoints();
+      orbit.userZoomed = false;
+      orbit.userPanned = false;
+      orbit.panX = 0;
+      orbit.panY = 0;
+      affineViewTransform = null;
+      updateViewPan();
+      drawPlane();
+      scheduleRebuild();
+    });
+
+    function randomGeneralPoints() {
+      for (let attempt = 0; attempt < 500; attempt += 1) {
+        const candidate = [];
+        for (let i = 0; i < 6; i += 1) {
+          candidate.push({
+            x: -2.0 + Math.random() * 4.0,
+            y: -1.8 + Math.random() * 3.6
+          });
+        }
+        const previous = points;
+        points = candidate;
+        const rank = computeCubicBasis().rank;
+        const report = analyzeConfiguration(rank, 27);
+        points = previous;
+        if (report.ok) return candidate;
+      }
+      return clonePoints(defaultPoints);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener("resize", () => {
+      resizePlaneCanvas();
+      resizeRenderer();
+    });
+
+    resizePlaneCanvas();
+    resizeRenderer();
+    rebuildModel();
+    animate();
+  </script>
+</body>
+</html>
