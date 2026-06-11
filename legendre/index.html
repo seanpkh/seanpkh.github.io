@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Legendre Monodromy</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Legendre Monodromy</h1>
+          <br>
+         <details>
+     	<summary>Description (click to expand)</summary>
+	<p style="display: block; padding-left: 40px;">
+	<br>
+	For a given complex number λ not equal to 0 or 1, the elliptic curve described by the equation y^2 = x(x - 1)(x - λ)
+	can be constructed as a complex manifold from the complex plane by making a branch-cut between 0 and 1, a branch cut between λ and infinity, and then glueing in a second copy of the complex plane along these cuts (this constructs the Riemann surface where there is a single-valued square root of x(x - 1)(x - λ), i.e. y). The branch-cuts here are illustrated in the left plane with red and purple dotted lines, while the green and orange solid curves give a basis for the integral homology of the curve (the green curve must doubled in the second copy of the complex plane). We can integrate the canonical differential dx/y along this homology basis as the contour integral of 1/sqrt(x(x - 1)(x - λ)) (or twice this integral in the case of the green curve). The values of the two period integrals are displayed in the right-hand side along with the lattice they generate; in particular, the elliptic curve corresponding to λ (with its point at infinity) is isomorphic to the complex numbers modulo the displayed lattice. 
+<br><br>
+	This app lets you drag around the point λ and will deform the contours to avoid the branch cuts as you do so. TIf you drag λ in a loop around 0 or 1, you will obtain a non-trivial monodromy showing how the basis vectors for this lattice are acted on by the fundamental group of the complex numbers minus 0 and 1. More on the mathematics of the Legendre family surrounding these constructions can be found, e.g., in  Section 1.1 of Period Mappings and Period Domains by Carlson, Muller-Stach, and Peters.
+         </p>
+         </details>
+        </div>
+        <button id="reset-button" type="button">Reset</button>
+      </header>
+
+      <section class="planes" aria-label="Legendre monodromy visualization">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>x-plane</h2>
+              <p id="t-readout" class="readout">λ = 2.000 + 0.000i</p>
+            </div>
+          </div>
+          <canvas
+            id="parameter-plane"
+            aria-label="Complex x-plane with branch cuts, contours, and draggable lambda"
+          ></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>period plane</h2>
+              <p class="readout">
+                <span id="period-one">Iγ = 2 int(λ->3->0) = 0.000 + 0.000i</span>
+                <span id="period-two">Iδ = int(δ) = 0.000 + 0.000i</span>
+              </p>
+            </div>
+            <label class="period-update-toggle">
+              <input id="dynamic-period-updates" type="checkbox" checked>
+              <span>Live periods</span>
+            </label>
+          </div>
+          <canvas
+            id="period-plane"
+            aria-label="Complex period plane showing the two contour integrals"
+          ></canvas>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
